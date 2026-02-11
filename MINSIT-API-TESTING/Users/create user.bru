@@ -1,0 +1,25 @@
+meta {
+  name: create user
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_url}}users
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Hector Guerrero",
+    "username": "hguerrero",
+    "password": "password",
+    "password_confirmation": "password"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

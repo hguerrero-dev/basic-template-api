@@ -1,0 +1,9 @@
+{
+  "version": "1",
+  "name": "MINSIT-API-TESTING",
+  "type": "collection",
+  "ignore": [
+    "node_modules",
+    ".git"
+  ]
+}
