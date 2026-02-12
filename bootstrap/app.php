@@ -1,7 +1,5 @@
 <?php
 
-use Throwable;
-
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
