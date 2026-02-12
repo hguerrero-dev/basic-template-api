@@ -5,7 +5,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use League\Config\Exception\ValidationException;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
@@ -38,16 +38,6 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        $exceptions->render(function (ValidationException $e, $request) {
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'error' => 'VALIDATION_ERROR',
-                    'message' => 'Invalid data provided',
-                    'errors' => $e->getMessages(),
-                ], 422);
-            }
-        });
-
         $exceptions->render(function (QueryException $e, $request) {
             if ($request->expectsJson()) {
                 return response()->json([
@@ -65,6 +55,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     'error' => 'NOT_FOUND',
                     'message' => 'Resource not found',
                 ], 404);
+            }
+        });
+
+        $exceptions->render(function (ValidationException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'VALIDATION_ERROR',
+                    'message' => 'Invalid data provided',
+                    'errors' => $e->errors(),
+                ], 422);
             }
         });
 
