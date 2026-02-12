@@ -1,8 +1,13 @@
 <?php
 
+use Throwable;
+
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
+use League\Config\Exception\ValidationException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
@@ -32,6 +37,47 @@ return Application::configure(basePath: dirname(__DIR__))
                     'error' => 'UNAUTHORIZED',
                     'message' => 'Authentication required',
                 ], 401);
+            }
+        });
+
+        $exceptions->render(function (ValidationException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'VALIDATION_ERROR',
+                    'message' => 'Invalid data provided',
+                    'errors' => $e->getMessages(),
+                ], 422);
+            }
+        });
+
+        $exceptions->render(function (QueryException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'DATABASE_ERROR',
+                    'message' => config('app.debug')
+                        ? $e->getMessage()
+                        : 'Database operation failed',
+                ], 500);
+            }
+        });
+
+        $exceptions->render(function (ModelNotFoundException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'NOT_FOUND',
+                    'message' => 'Resource not found',
+                ], 404);
+            }
+        });
+
+        $exceptions->render(function (Throwable $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'INTERNAL_SERVER_ERROR',
+                    'message' => config('app.debug')
+                        ? $e->getMessage()
+                        : 'Something went wrong',
+                ], 500);
             }
         });
     })->create();
