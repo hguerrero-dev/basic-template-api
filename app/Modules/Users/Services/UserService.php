@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Services;
 
+use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Hash;
@@ -15,7 +16,7 @@ class UserService
 
     public function get($id)
     {
-        // Logic to retrieve a user
+        return User::with('roles')->findOrFail($id);
     }
 
     public function create($data)
@@ -24,25 +25,56 @@ class UserService
             'name' => $data['name'],
             'username' => $data['username'],
             'email' => $data['email'] ?? null,
-            'password' => Hash::make($data['password']),
+            'password' => $this->hashPassword($data['password']),
+            'status' => $data['status'] ?? UserStatus::Active,
         ]);
 
-        if (isset($data['roles'])) {
-            $user->assignRole($data['roles']);
-        } else {
-            $user->assignRole('user');
-        }
+        $this->manageRoles($user, $data['roles'] ?? []);
 
         return $user;
     }
 
     public function update($id, $data)
     {
-        // Logic to update a user
+        $user = User::findOrFail($id);
+
+        $user->update([
+            'name' => $data['name'],
+            'username' => $data['username'],
+            'email' => $data['email'] ?? null,
+            'status' => $data['status'] ?? UserStatus::Active,
+        ]);
+
+        if (isset($data['password'])) {
+            $user->update([
+                'password' => $this->hashPassword($data['password']),
+            ]);
+        }
+
+        $this->manageRoles($user, $data['roles'] ?? []);
+
+        return $user;
     }
 
     public function delete($id)
     {
-        // Logic to delete a user
+        $user = User::findOrFail($id);
+        $user->delete();
+    }
+
+    protected function manageRoles(User $user, array $roles)
+    {
+        if ($roles) {
+            $user->syncRoles($roles);
+        } elseif ($user->roles()->count() === 0) {
+            $user->assignRole('user');
+        }
+    }
+
+    protected function hashPassword(string $password): string
+    {
+        if (Hash::needsRehash($password)) return Hash::make($password);
+
+        return $password;
     }
 }

@@ -1,0 +1,16 @@
+meta {
+  name: get form user options
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_url}}users/options
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
