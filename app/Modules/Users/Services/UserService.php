@@ -73,7 +73,9 @@ class UserService
 
     protected function hashPassword(string $password): string
     {
-        if (Hash::needsRehash($password)) return Hash::make($password);
+        if (Hash::needsRehash($password)) {
+            return Hash::make($password);
+        }
 
         return $password;
     }

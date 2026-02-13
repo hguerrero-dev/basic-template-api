@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Modules\Users\Database\Seeders\UserPermissionSeeder;
 use Illuminate\Database\Seeder;
 use App\Modules\Users\Models\User;
 
@@ -11,6 +12,8 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Primero crear roles y permisos
         $this->call(RolesAndPermissionsSeeder::class);
+
+        $this->call(UserPermissionSeeder::class);
 
         // 2. Crear un Admin y asignarle el rol
         $admin = User::factory()->create([

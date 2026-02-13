@@ -15,9 +15,11 @@ class AuthService
             ->orWhere('username', $identifier)
             ->first();
 
-        if (!$user || !Hash::check($password, $user->password)) throw ValidationException::withMessages([
-            'username' => ['Credenciales inválidas.'],
-        ]);
+        if (!$user || !Hash::check($password, $user->password)) {
+            throw ValidationException::withMessages([
+                'username' => ['Credenciales inválidas.'],
+            ]);
+        }
 
         if ($user->status !== UserStatus::Active) {
 
