@@ -1,0 +1,23 @@
+meta {
+  name: update role
+  type: http
+  seq: 4
+}
+
+put {
+  url: {{base_url}}roles/4
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Rol de prueba actualizado",
+    "permissions": [1,2,3]
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -1,0 +1,23 @@
+meta {
+  name: update user
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{base_url}}users/019c57e3-751a-72a4-a0f6-16b4ab45cd84
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Juan Perez",
+    "username": "jperez"
+  }
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

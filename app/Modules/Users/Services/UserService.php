@@ -14,7 +14,7 @@ class UserService
         return User::with('roles')->get();
     }
 
-    public function get($id)
+    public function getByOne($id)
     {
         return User::with('roles')->findOrFail($id);
     }

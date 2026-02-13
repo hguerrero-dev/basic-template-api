@@ -3,10 +3,9 @@
 namespace App\Modules\Roles\Requests;
 
 use App\Modules\Core\Requests\BaseRequest;
-use App\Modules\Roles\Enums\SystemPermission;
 use Illuminate\Validation\Rule;
 
-class CreateRoleRequest extends BaseRequest
+class UpdateRoleRequest extends BaseRequest
 {
     public function authorize(): bool
     {
@@ -15,6 +14,8 @@ class CreateRoleRequest extends BaseRequest
 
     public function rules(): array
     {
+        $roleId = $this->route('role')?->id ?? $this->route('role');
+
         return [
             'name' => [
                 'required',
@@ -22,7 +23,7 @@ class CreateRoleRequest extends BaseRequest
                 'max:255',
                 Rule::unique('roles', 'name')->where(function ($query) {
                     return $query->where('guard_name', 'api');
-                })
+                })->ignore($roleId)
             ],
             // => Validate that 'permissions' is an array of existing permission IDs
             'permissions' => ['nullable', 'array'],

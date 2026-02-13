@@ -43,15 +43,21 @@ class UserController extends BaseController
         ]);
     }
 
+    public function show($id): JsonResponse
+    {
+        $user = $this->userService->getByOne($id);
+
+        return response()->json([
+            'message' => 'Usuario obtenido exitosamente',
+            'data'    => $user
+        ]);
+    }
+
     public function store(CreateUserRequest $request): JsonResponse
     {
-        // 1. request->validated() nos da solo los datos limpios
         $data = $request->validated();
-
-        // 2. Delegamos la lógica al servicio
         $user = $this->userService->create($data);
 
-        // 3. Retornamos respuesta (201 Created)
         return response()->json([
             'message' => 'Usuario creado correctamente',
             'data'    => $user
@@ -67,6 +73,16 @@ class UserController extends BaseController
         return response()->json([
             'message' => 'Usuario actualizado correctamente',
             'data'    => $user
+        ]);
+    }
+
+
+    public function destroy($id): JsonResponse
+    {
+        $this->userService->delete($id);
+
+        return response()->json([
+            'message' => 'Usuario eliminado correctamente'
         ]);
     }
 }

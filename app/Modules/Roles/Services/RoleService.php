@@ -15,6 +15,11 @@ class RoleService
         return Role::with('permissions')->get();
     }
 
+    public function getByOne($id)
+    {
+        return Role::with('permissions')->findOrFail($id);
+    }
+
     public function create(array $data): Role
     {
         return DB::transaction(function () use ($data) {
