@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Services;
 
+use App\Modules\Roles\Enums\SystemRole;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Database\Eloquent\Collection;
@@ -67,7 +68,7 @@ class UserService
         if ($roles) {
             $user->syncRoles($roles);
         } elseif ($user->roles()->count() === 0) {
-            $user->assignRole('user');
+            $user->assignRole(SystemRole::Customer->value); // Asigna un rol vacío para evitar inconsistencias
         }
     }
 
