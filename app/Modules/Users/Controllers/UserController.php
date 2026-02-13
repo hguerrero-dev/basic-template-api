@@ -8,7 +8,9 @@ use App\Modules\Users\Services\UserService;
 use App\Modules\Users\Requests\CreateUserRequest;
 use App\Modules\Users\Requests\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
+use App\Modules\Users\Resources\UserResource;
 
 class UserController extends BaseController
 {
@@ -16,15 +18,14 @@ class UserController extends BaseController
 
     public function getFormOptions(): JsonResponse
     {
-
         $statuses = array_map(fn($status) => [
             'label' => ucfirst($status->value),
             'value' => $status->value,
         ], UserStatus::cases());
 
-        $roles = Role::pluck('name')->map(fn($role) => [
-            'label' => ucfirst($role),
-            'value' => $role,
+        $roles = Role::get()->map(fn($role) => [
+            'label' => ucfirst($role->name),
+            'value' => $role->id,
         ]);
 
         return response()->json([
@@ -33,14 +34,20 @@ class UserController extends BaseController
         ]);
     }
 
-    public function index(): JsonResponse
+    public function index(Request $request)
     {
-        $users = $this->userService->getAll();
+        // => read this from config/api.php (global config for API)
+        $default = config('api.pagination.default');
+        $max     = config('api.pagination.max');
 
-        return response()->json([
-            'message' => 'Usuarios obtenidos exitosamente',
-            'data'    => $users
-        ]);
+        $perPage = (int) $request->input('per_page', $default);
+        $search  = $request->input('search');
+
+        if ($perPage > $max) $perPage = $max;
+
+        $users = $this->userService->getAll($search, $perPage);
+
+        return UserResource::collection($users);
     }
 
     public function show($id): JsonResponse
@@ -49,7 +56,7 @@ class UserController extends BaseController
 
         return response()->json([
             'message' => 'Usuario obtenido exitosamente',
-            'data'    => $user
+            'data'    => new UserResource($user)
         ]);
     }
 
@@ -60,7 +67,7 @@ class UserController extends BaseController
 
         return response()->json([
             'message' => 'Usuario creado correctamente',
-            'data'    => $user
+            'data'    => new UserResource($user)
         ], 201);
     }
 
@@ -72,7 +79,7 @@ class UserController extends BaseController
 
         return response()->json([
             'message' => 'Usuario actualizado correctamente',
-            'data'    => $user
+            'data'    => new UserResource($user)
         ]);
     }
 

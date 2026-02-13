@@ -19,7 +19,7 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes;
 
-    protected $guard_name = 'api'; // => Esto es importante para que Spatie sepa que este modelo usa el guard 'api' y asigne roles y permisos correctamente
+    protected $guard_name = 'api'; // => this is required for Spatie permissions to work with Sanctum
 
     /**
      * The attributes that are mass assignable.
