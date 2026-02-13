@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Modules\Users\Database\Seeders;
+namespace App\Modules\Roles\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use App\Modules\Users\Enums\UserPermission;
+use App\Modules\Roles\Enums\SystemPermission;
 use Spatie\Permission\Models\Permission;
 
-class UserPermissionSeeder extends Seeder
+class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (UserPermission::cases() as $permission) {
+        foreach (SystemPermission::cases() as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission->value,
                 'guard_name' => 'api'
