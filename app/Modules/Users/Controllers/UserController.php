@@ -36,16 +36,10 @@ class UserController extends BaseController
 
     public function index(Request $request)
     {
-        // => read this from config/api.php (global config for API)
-        $default = config('api.pagination.default');
-        $max     = config('api.pagination.max');
-
-        $perPage = (int) $request->input('per_page', $default);
-        $search  = $request->input('search');
-
-        if ($perPage > $max) $perPage = $max;
-
-        $users = $this->userService->getAll($search, $perPage);
+        $users = $this->userService->getAll(
+            $request->input('search'),
+            $request->input('per_page')
+        );
 
         return UserResource::collection($users);
     }

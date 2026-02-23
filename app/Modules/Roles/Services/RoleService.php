@@ -2,17 +2,22 @@
 
 namespace App\Modules\Roles\Services;
 
+use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\Enums\SystemRole;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class RoleService
+class RoleService extends BaseService
 {
-    public function getAll()
+    public function getAll(?string $search = null, ?int $perPage = null)
     {
-        return Role::with('permissions')->get();
+        return $this->paginate(Role::with('permissions'), [
+            'search' => $search,
+            'perPage' => $perPage,
+            'searchFields' => ['name']
+        ]);
     }
 
     public function getByOne($id)

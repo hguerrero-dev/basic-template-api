@@ -2,27 +2,21 @@
 
 namespace App\Modules\Users\Services;
 
+use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\Enums\SystemRole;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-class UserService
+class UserService extends BaseService
 {
     public function getAll(?string $search = null, ?int $perPage = null)
     {
-        $limit = $perPage ?? config('api.pagination.default');
-
-        return User::with('roles')
-            ->when($search, function ($query) use ($search) {
-                $query->where(function ($block) use ($search) {
-                    $block->where('name', 'like', "%{$search}%")
-                        ->orWhere('username', 'like', "%{$search}%")
-                        ->orWhere('email', 'like', "%{$search}%");
-                });
-            })
-            ->orderBy('created_at', 'desc')
-            ->paginate($limit);
+        return $this->paginate(User::with('roles'), [
+            'search' => $search,
+            'perPage' => $perPage,
+            'searchFields' => ['name', 'username', 'email']
+        ]);
     }
 
     public function getByOne($id)

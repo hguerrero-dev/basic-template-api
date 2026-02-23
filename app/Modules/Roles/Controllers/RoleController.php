@@ -10,13 +10,18 @@ use App\Modules\Roles\Requests\CreateRoleRequest;
 use App\Modules\Roles\Requests\UpdateRoleRequest;
 use App\Modules\Roles\Services\RoleService;
 
+use Illuminate\Http\Request;
+
 class RoleController extends BaseController
 {
     public function __construct(protected RoleService $roleService) {}
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
-        $roles = $this->roleService->getAll();
+        $roles = $this->roleService->getAll(
+            $request->input('search'),
+            $request->input('per_page')
+        );
 
         return response()->json([
             'message' => 'Roles obtenidos exitosamente',
