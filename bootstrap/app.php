@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
@@ -24,8 +25,17 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson()) {
                 return response()->json([
                     'error' => 'FORBIDDEN',
-                    'message' => 'You do not have permission to perform this action',
+                    'message' => 'You do not have permission to perform this action. Please contact the administrator if you believe this is an error.',
                 ], 403);
+            }
+        });
+
+        $exceptions->render(function (AuthenticationException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'error' => 'UNAUTHORIZED',
+                    'message' => 'Authentication required to access this resource. Please provide valid credentials.',
+                ], 401);
             }
         });
 
@@ -33,7 +43,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson()) {
                 return response()->json([
                     'error' => 'UNAUTHORIZED',
-                    'message' => 'Authentication required',
+                    'message' => 'Authentication required to access this resource. Please provide valid credentials.',
                 ], 401);
             }
         });
@@ -44,7 +54,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'error' => 'DATABASE_ERROR',
                     'message' => config('app.debug')
                         ? $e->getMessage()
-                        : 'Database operation failed',
+                        : 'Database operation failed.',
                 ], 500);
             }
         });
@@ -53,7 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson()) {
                 return response()->json([
                     'error' => 'NOT_FOUND',
-                    'message' => 'Resource not found',
+                    'message' => 'Resource not found. Please check the identifier and try again.',
                 ], 404);
             }
         });
@@ -62,7 +72,7 @@ return Application::configure(basePath: dirname(__DIR__))
             if ($request->expectsJson()) {
                 return response()->json([
                     'error' => 'VALIDATION_ERROR',
-                    'message' => 'Invalid data provided',
+                    'message' => 'Invalid data provided. Please correct the errors and try again.',
                     'errors' => $e->errors(),
                 ], 422);
             }
@@ -74,7 +84,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'error' => 'INTERNAL_SERVER_ERROR',
                     'message' => config('app.debug')
                         ? $e->getMessage()
-                        : 'Something went wrong',
+                        : 'Something went wrong. Please try again later.',
                 ], 500);
             }
         });

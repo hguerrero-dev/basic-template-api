@@ -40,4 +40,9 @@ class AuthService
             'permissions' => $user->getAllPermissions()->pluck('name'),
         ];
     }
+
+    public function logout(User $user)
+    {
+        $user->tokens()->delete();
+    }
 }
