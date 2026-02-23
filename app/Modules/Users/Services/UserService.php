@@ -6,12 +6,26 @@ use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\Enums\SystemRole;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseService
 {
     public function getAll(?string $search = null, ?int $perPage = null)
     {
+
+        $page = request()->input('page', 1);
+        $cacheKey = "users_lists:{$search}:page:{$page}:per_page:{$perPage}";
+
+        return Cache::tags(['users'])->remember($cacheKey, 3600, function () use ($search, $perPage) {
+            return $this->paginate(User::with('roles'), [
+                'search' => $search,
+                'perPage' => $perPage,
+                'searchFields' => ['name', 'username', 'email']
+            ]);
+        });
+
         return $this->paginate(User::with('roles'), [
             'search' => $search,
             'perPage' => $perPage,
@@ -35,6 +49,8 @@ class UserService extends BaseService
         ]);
 
         $this->manageRoles($user, $data['roles'] ?? []);
+
+        Cache::tags(['users'])->flush();
 
         return $user;
     }
