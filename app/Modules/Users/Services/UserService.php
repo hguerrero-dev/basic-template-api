@@ -8,7 +8,6 @@ use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class UserService extends BaseService
 {
@@ -16,9 +15,15 @@ class UserService extends BaseService
     {
 
         $page = request()->input('page', 1);
-        $cacheKey = "users_lists:{$search}:page:{$page}:per_page:{$perPage}";
+        $cacheKey = sprintf(
+            '%s:s:%s:p:%s:pg:%s',
+            User::CACHE_KEY_LIST,
+            $search,
+            $perPage,
+            $page
+        );
 
-        return Cache::tags(['users'])->remember($cacheKey, 3600, function () use ($search, $perPage) {
+        return Cache::tags([User::CACHE_TAG])->remember($cacheKey, 3600, function () use ($search, $perPage) {
             return $this->paginate(User::with('roles'), [
                 'search' => $search,
                 'perPage' => $perPage,
@@ -35,7 +40,21 @@ class UserService extends BaseService
 
     public function getByOne($id)
     {
-        return User::with('roles')->findOrFail($id);
+        $cacheKey = sprintf('%s:id:%s', User::CACHE_KEY_DETAIL, $id);
+
+        $user = Cache::tags([User::CACHE_TAG])->remember($cacheKey, 3600, function () use ($id) {
+            return User::withTrashed()->with('roles')->findOrFail($id);
+        });
+
+        if ($user->trashed()) {
+            throw new \Exception('User is deleted');
+        }
+
+        if ($user->status === UserStatus::Inactive) {
+            throw new \Exception('User is inactive');
+        }
+
+        return $user;
     }
 
     public function create($data)
@@ -50,7 +69,7 @@ class UserService extends BaseService
 
         $this->manageRoles($user, $data['roles'] ?? []);
 
-        Cache::tags(['users'])->flush();
+        Cache::tags([User::CACHE_TAG])->flush();
 
         return $user;
     }
@@ -74,6 +93,8 @@ class UserService extends BaseService
 
         $this->manageRoles($user, $data['roles'] ?? []);
 
+        Cache::tags([User::CACHE_TAG])->flush();
+
         return $user;
     }
 
@@ -81,6 +102,7 @@ class UserService extends BaseService
     {
         $user = User::findOrFail($id);
         $user->delete();
+        Cache::tags([User::CACHE_TAG])->flush();
     }
 
     protected function manageRoles(User $user, array $roles)
@@ -88,8 +110,10 @@ class UserService extends BaseService
         if ($roles) {
             $user->syncRoles($roles);
         } elseif ($user->roles()->count() === 0) {
-            $user->assignRole(SystemRole::Customer->value); // Asigna un rol vacío para evitar inconsistencias
+            $user->assignRole(SystemRole::Customer->value);
         }
+
+        $user->touch(); // => Force update of updated_at to trigger model events and cache invalidation if roles are changed
     }
 
     protected function hashPassword(string $password): string

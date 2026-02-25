@@ -19,6 +19,10 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes;
 
+    public const CACHE_TAG = 'users'; // => General cache tag for all user-related caching
+    public const CACHE_KEY_LIST = 'user_list'; // => Base cache key for user list, can be combined with search and pagination parameters
+    public const CACHE_KEY_DETAIL = 'user_detail'; // => Base cache key for individual user details, can be combined with user ID
+
     protected $guard_name = 'api'; // => this is required for Spatie permissions to work with Sanctum
 
     /**
