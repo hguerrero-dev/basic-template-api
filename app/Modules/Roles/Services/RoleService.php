@@ -4,7 +4,9 @@ namespace App\Modules\Roles\Services;
 
 use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\Enums\SystemRole;
+use App\Modules\Roles\Models\Role as ModelsRole;
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -13,6 +15,25 @@ class RoleService extends BaseService
 {
     public function getAll(?string $search = null, ?int $perPage = null)
     {
+        $page = request()->input('page', 1);
+        $perPage = $perPage ?? config('api.pagination.default', 15);
+
+        $cacheKey = sprintf(
+            '%s:s:%s:p:%s:pg:%s',
+            ModelsRole::CACHE_KEY_LIST,
+            $search,
+            $perPage,
+            $page
+        );
+
+        return Cache::tags([ModelsRole::CACHE_TAG])->remember($cacheKey, 3600, function () use ($search, $perPage, $cacheKey) {
+            return $this->paginate(Role::with('permissions'), [
+                'search' => $search,
+                'perPage' => $perPage,
+                'searchFields' => ['name']
+            ]);
+        });
+
         return $this->paginate(Role::with('permissions'), [
             'search' => $search,
             'perPage' => $perPage,
@@ -22,7 +43,17 @@ class RoleService extends BaseService
 
     public function getByOne($id)
     {
-        return Role::with('permissions')->findOrFail($id);
+        $cacheKey = sprintf('%s:id:%s', ModelsRole::CACHE_KEY_DETAIL, $id);
+
+        $role = Cache::tags([ModelsRole::CACHE_TAG])->remember($cacheKey, 3600, function () use ($id) {
+            return Role::with('permissions')->findOrFail($id);
+        });
+
+        if (!$role) {
+            throw new Exception('Role not found');
+        }
+
+        return $role;
     }
 
     public function create(array $data): Role
@@ -34,6 +65,8 @@ class RoleService extends BaseService
             ]);
 
             $this->syncRolePermissions($role, $data);
+
+            Cache::tags([ModelsRole::CACHE_TAG])->flush();
 
             return $role;
         });
@@ -49,6 +82,8 @@ class RoleService extends BaseService
 
             $this->syncRolePermissions($role, $data);
 
+            Cache::tags([ModelsRole::CACHE_TAG])->flush();
+
             return $role;
         });
     }
@@ -62,6 +97,8 @@ class RoleService extends BaseService
         if (in_array($role->name, SystemRole::protectedRoles())) {
             throw new Exception('No se puede eliminar un rol protegido del sistema.');
         }
+
+        Cache::tags([ModelsRole::CACHE_TAG])->flush();
 
         $role->delete();
     }
