@@ -15,6 +15,8 @@ class UserService extends BaseService
     {
 
         $page = request()->input('page', 1);
+        $perPage = $perPage ?? config('api.pagination.default', 15);
+
         $cacheKey = sprintf(
             '%s:s:%s:p:%s:pg:%s',
             User::CACHE_KEY_LIST,
@@ -23,7 +25,7 @@ class UserService extends BaseService
             $page
         );
 
-        return Cache::tags([User::CACHE_TAG])->remember($cacheKey, 3600, function () use ($search, $perPage) {
+        return Cache::tags([User::CACHE_TAG])->remember($cacheKey, 3600, function () use ($search, $perPage, $cacheKey) {
             return $this->paginate(User::with('roles'), [
                 'search' => $search,
                 'perPage' => $perPage,
