@@ -1,10 +1,11 @@
 <?php
 
+use App\Modules\Core\Constants\MiddlewareAlias;
 use App\Modules\Roles\Controllers\RoleController;
 use App\Modules\Roles\Enums\RolePermission;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('roles')->group(function () {
+Route::middleware(['auth:sanctum', MiddlewareAlias::ROLE_RATE_LIMITER])->prefix('roles')->group(function () {
     Route::get('/', [RoleController::class, 'index'])
         ->middleware('can:' . RolePermission::View->value);
 

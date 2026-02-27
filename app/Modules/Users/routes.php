@@ -1,10 +1,11 @@
 <?php
 
+use App\Modules\Core\Constants\MiddlewareAlias;
 use App\Modules\Users\Controllers\UserController;
 use App\Modules\Users\Enums\UserPermission;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->prefix('users')->group(function () {
+Route::middleware(['auth:sanctum', MiddlewareAlias::ROLE_RATE_LIMITER])->prefix('users')->group(function () {
     Route::get('/options', [UserController::class, 'getFormOptions'])
         ->middleware('can:' . UserPermission::View->value);
 
