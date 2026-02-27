@@ -2,10 +2,13 @@
 
 namespace App\Modules\Roles\Models;
 
+use App\Modules\Core\Traits\HasAudit;
+use OwenIt\Auditing\Contracts\Auditable;
 use Spatie\Permission\Models\Role as SpatieRole;
 
-class Role extends SpatieRole
+class Role extends SpatieRole implements Auditable
 {
+    use HasAudit;
     public const CACHE_TAG = 'roles';
     public const CACHE_KEY_LIST = 'roles_list';
     public const CACHE_KEY_DETAIL = 'role_detail';

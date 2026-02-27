@@ -13,11 +13,13 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use OwenIt\Auditing\Contracts\Auditable;
+use App\Modules\Core\Traits\HasAudit;
 
-class User extends Authenticatable
+class User extends Authenticatable implements Auditable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes;
+    use HasAudit, HasApiTokens, HasFactory, Notifiable, HasUuids, HasRoles, SoftDeletes;
 
     public const CACHE_TAG = 'users'; // => General cache tag for all user-related caching
     public const CACHE_KEY_LIST = 'user_list'; // => Base cache key for user list, can be combined with search and pagination parameters
