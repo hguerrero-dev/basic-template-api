@@ -20,10 +20,7 @@ body:json {
 script:post-response {
   // Verificamos que el login fue exitoso (status 200)
   if (res.status === 200) {
-      // Tomamos el token de la respuesta JSON
-      const token = res.body.access_token;
-      
-      // Guardamos el token en una variable de entorno llamada 'token'
+      const token = res.body.data.token;
       bru.setEnvVar("token", token);
   }
 }

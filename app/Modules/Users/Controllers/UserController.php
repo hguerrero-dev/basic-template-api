@@ -28,18 +28,18 @@ class UserController extends BaseController
             'value' => $role->id,
         ]);
 
-        return response()->json([
+        return $this->successResponse([
             'statuses' => $statuses,
-            'roles' => $roles,
-        ]);
+            'roles' => $roles
+        ], 'Opciones de formulario obtenidas correctamente');
     }
 
     public function me(Request $request)
     {
-        return [
+        return $this->successResponse([
             'user' => $request->user(),
             'permissions' => $request->user()->getAllPermissions()->pluck('name')
-        ];
+        ], 'Información del usuario obtenida correctamente');
     }
 
     public function index(Request $request)
@@ -49,17 +49,20 @@ class UserController extends BaseController
             $request->input('per_page')
         );
 
-        return UserResource::collection($users);
+        return $this->successResponse(
+            UserResource::collection($users),
+            'Usuarios obtenidos correctamente'
+        );
     }
 
     public function show($id): JsonResponse
     {
         $user = $this->userService->getByOne($id);
 
-        return response()->json([
-            'message' => 'Usuario obtenido exitosamente',
-            'data'    => new UserResource($user)
-        ]);
+        return $this->successResponse(
+            new UserResource($user),
+            'Usuario obtenido correctamente'
+        );
     }
 
     public function store(CreateUserRequest $request): JsonResponse
@@ -67,10 +70,11 @@ class UserController extends BaseController
         $data = $request->validated();
         $user = $this->userService->create($data);
 
-        return response()->json([
-            'message' => 'Usuario creado correctamente',
-            'data'    => new UserResource($user)
-        ], 201);
+        return $this->successResponse(
+            new UserResource($user),
+            'Usuario creado correctamente',
+            201
+        );
     }
 
     public function update($id, UpdateUserRequest $request): JsonResponse
@@ -79,10 +83,10 @@ class UserController extends BaseController
 
         $user = $this->userService->update($id, $data);
 
-        return response()->json([
-            'message' => 'Usuario actualizado correctamente',
-            'data'    => new UserResource($user)
-        ]);
+        return $this->successResponse(
+            new UserResource($user),
+            'Usuario actualizado correctamente'
+        );
     }
 
 
@@ -90,8 +94,6 @@ class UserController extends BaseController
     {
         $this->userService->delete($id);
 
-        return response()->json([
-            'message' => 'Usuario eliminado correctamente'
-        ]);
+        return $this->successResponse(null, 'Usuario eliminado correctamente');
     }
 }

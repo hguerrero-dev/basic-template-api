@@ -17,7 +17,7 @@ class AuthController extends BaseController
         $credentials = $request->validated();
         $identifier = $credentials['username'] ?? $credentials['email'] ?? null;
 
-        if (!$identifier) return response()->json(['message' => 'Username or email is required.'], 422);
+        if (!$identifier) return $this->errorResponse('Username or email is required.', 'INVALID_CREDENTIALS', 422);
 
         $password = $credentials['password'] ?? null;
 
@@ -27,12 +27,9 @@ class AuthController extends BaseController
                 $password
             );
 
-            return response()->json([
-                'access_token' => $result['token'],
-                'user' => $result['user']
-            ]);
+            return $this->successResponse($result, 'Logged in successfully');
         } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 401);
+            return $this->errorResponse($e->getMessage(), 'AUTHENTICATION_FAILED', 401);
         }
     }
 
@@ -40,6 +37,6 @@ class AuthController extends BaseController
     {
         $this->authService->logout($request->user());
 
-        return response()->json(['message' => 'Logged out successfully']);
+        return $this->successResponse(null, 'Logged out successfully');
     }
 }

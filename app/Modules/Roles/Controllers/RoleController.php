@@ -4,12 +4,11 @@ namespace App\Modules\Roles\Controllers;
 
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Spatie\Permission\Models\Role;
+use App\Modules\Roles\Models\Role;
 use App\Modules\Core\Controllers\BaseController;
 use App\Modules\Roles\Requests\CreateRoleRequest;
 use App\Modules\Roles\Requests\UpdateRoleRequest;
 use App\Modules\Roles\Services\RoleService;
-
 use Illuminate\Http\Request;
 
 class RoleController extends BaseController
@@ -23,30 +22,24 @@ class RoleController extends BaseController
             $request->input('per_page')
         );
 
-        return response()->json([
-            'message' => 'Roles obtenidos exitosamente',
-            'data'    => $roles
-        ], 200);
+        return $this->successResponse(
+            $roles,
+            'Roles obtenidos correctamente'
+        );
     }
 
     public function show($id): JsonResponse
     {
         $role = $this->roleService->getByOne($id);
 
-        return response()->json([
-            'message' => 'Rol obtenido exitosamente',
-            'data'    => $role
-        ], 200);
+        return $this->successResponse($role, 'Rol obtenido exitosamente');
     }
 
     public function create(): JsonResponse
     {
         $permissions = $this->roleService->getAllPermissionsGrouped();
 
-        return response()->json([
-            'message' => 'Permisos obtenidos exitosamente',
-            'data'    => $permissions
-        ], 200);
+        return $this->successResponse($permissions, 'Permisos obtenidos exitosamente');
     }
 
     public function store(CreateRoleRequest $request): JsonResponse
@@ -55,10 +48,7 @@ class RoleController extends BaseController
 
         $role = $this->roleService->create($data);
 
-        return response()->json([
-            'message' => 'Rol creado correctamente',
-            'data'    => $role
-        ], 201);
+        return $this->successResponse($role, 'Rol creado correctamente', 201);
     }
 
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
@@ -67,24 +57,16 @@ class RoleController extends BaseController
 
         $updatedRole = $this->roleService->update($role, $data);
 
-        return response()->json([
-            'message' => 'Rol actualizado correctamente',
-            'data'    => $updatedRole
-        ], 200);
+        return $this->successResponse($updatedRole, 'Rol actualizado correctamente');
     }
 
     public function destroy(Role $role): JsonResponse
     {
         try {
             $this->roleService->delete($role);
-
-            return response()->json([
-                'message' => 'Rol eliminado correctamente'
-            ], 200);
+            return $this->successResponse(null, 'Rol eliminado correctamente');
         } catch (Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], 400);
+            return $this->errorResponse($e->getMessage(), 'ROLE_DELETE_ERROR', 400);
         }
     }
 }
