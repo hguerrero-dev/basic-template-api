@@ -4,6 +4,7 @@ namespace App\Modules\Auth\Services;
 
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 
@@ -36,7 +37,7 @@ class AuthService
         return [
             'token' => $user->createToken('auth_token')->plainTextToken,
             'user' => $user,
-            'roles' => $user->roles->pluck('name'),
+            'roles' => $user->getRoleNames(), // => Get role names as an array
             'permissions' => $user->getAllPermissions()->pluck('name'),
         ];
     }

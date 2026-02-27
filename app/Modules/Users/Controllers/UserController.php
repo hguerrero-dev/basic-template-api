@@ -34,6 +34,14 @@ class UserController extends BaseController
         ]);
     }
 
+    public function me(Request $request)
+    {
+        return [
+            'user' => $request->user(),
+            'permissions' => $request->user()->getAllPermissions()->pluck('name')
+        ];
+    }
+
     public function index(Request $request)
     {
         $users = $this->userService->getAll(
