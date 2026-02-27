@@ -20,4 +20,14 @@ class CreateUserRequest extends BaseRequest
             'roles.*' => ['integer', 'exists:roles,id'],
         ];
     }
+
+    public function messages(): array
+    {
+        return [
+            'email.unique' => 'El correo electrónico ya está en uso.',
+            'username.unique' => 'El nombre de usuario ya está en uso.',
+            'password.confirmed' => 'La confirmación de la contraseña no coincide.',
+            'roles.*.exists' => 'Uno o más roles seleccionados no existen.',
+        ];
+    }
 }
