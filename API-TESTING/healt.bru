@@ -1,0 +1,15 @@
+meta {
+  name: healt
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://127.0.0.1:8000/health
+  body: none
+  auth: inherit
+}
+
+settings {
+  encodeUrl: true
+}
