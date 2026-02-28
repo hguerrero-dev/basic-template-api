@@ -6,6 +6,8 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use App\Modules\Roles\Models\Role;
 use App\Modules\Core\Controllers\BaseController;
+use App\Modules\Roles\DTOs\CreateRoleDTO;
+use App\Modules\Roles\DTOs\UpdateRoleDTO;
 use App\Modules\Roles\Requests\CreateRoleRequest;
 use App\Modules\Roles\Requests\UpdateRoleRequest;
 use App\Modules\Roles\Services\RoleService;
@@ -44,18 +46,24 @@ class RoleController extends BaseController
 
     public function store(CreateRoleRequest $request): JsonResponse
     {
-        $data = $request->validated();
-
-        $role = $this->roleService->create($data);
+        $dto = new CreateRoleDTO(
+            $request->input('name'),
+            $request->input('permissions', [])
+        );
+        $role = $this->roleService->create($dto);
 
         return $this->successResponse($role, 'Rol creado correctamente', 201);
     }
 
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
     {
-        $data = $request->validated();
-
-        $updatedRole = $this->roleService->update($role, $data);
+        dd($role->id);
+        $dto = new UpdateRoleDTO(
+            $role->id,
+            $request->input('name'),
+            $request->input('permissions', [])
+        );
+        $updatedRole = $this->roleService->update($role, $dto);
 
         return $this->successResponse($updatedRole, 'Rol actualizado correctamente');
     }

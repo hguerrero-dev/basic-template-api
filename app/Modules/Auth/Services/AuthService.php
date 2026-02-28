@@ -25,8 +25,8 @@ class AuthService
         if ($user->status !== UserStatus::Active) {
 
             $mensaje = match ($user->status) {
-                UserStatus::Banned => 'Tu cuenta ha sido bloqueada permanently.',
-                UserStatus::Pending => 'Debes verificar tu correo primero.',
+                UserStatus::Banned => 'Tu cuenta ha sido bloqueada permanentemente.',
+                UserStatus::Pending => 'Debes verificar tu correo electrónico primero.',
                 UserStatus::Inactive => 'Tu cuenta está desactivada.',
                 default => 'No tienes acceso.',
             };

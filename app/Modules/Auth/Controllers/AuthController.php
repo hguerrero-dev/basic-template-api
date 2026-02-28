@@ -2,6 +2,7 @@
 
 namespace App\Modules\Auth\Controllers;
 
+use App\Modules\Auth\DTOs\LoginDTO;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Modules\Auth\Requests\LoginRequest;
@@ -14,20 +15,23 @@ class AuthController extends BaseController
 
     public function login(LoginRequest $request): JsonResponse
     {
-        $credentials = $request->validated();
-        $identifier = $credentials['username'] ?? $credentials['email'] ?? null;
+        $dto = new LoginDTO($request->validated());
 
-        if (!$identifier) return $this->errorResponse('Username or email is required.', 'INVALID_CREDENTIALS', 422);
-
-        $password = $credentials['password'] ?? null;
+        if (!$dto->identifier) {
+            return $this->errorResponse(
+                'Debes proporcionar un nombre de usuario o correo electrónico para iniciar sesión.',
+                'IDENTIFIER_REQUIRED',
+                422
+            );
+        }
 
         try {
             $result = $this->authService->authenticate(
-                $identifier,
-                $password
+                $dto->identifier,
+                $dto->password
             );
 
-            return $this->successResponse($result, 'Logged in successfully');
+            return $this->successResponse($result, 'Inicio de sesión exitoso');
         } catch (\Exception $e) {
             return $this->errorResponse($e->getMessage(), 'AUTHENTICATION_FAILED', 401);
         }
@@ -37,6 +41,6 @@ class AuthController extends BaseController
     {
         $this->authService->logout($request->user());
 
-        return $this->successResponse(null, 'Logged out successfully');
+        return $this->successResponse(null, 'Cierre de sesión exitoso');
     }
 }

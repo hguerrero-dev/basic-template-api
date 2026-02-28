@@ -3,6 +3,8 @@
 namespace App\Modules\Roles\Services;
 
 use App\Modules\Core\Services\BaseService;
+use App\Modules\Roles\DTOs\CreateRoleDTO;
+use App\Modules\Roles\DTOs\UpdateRoleDTO;
 use App\Modules\Roles\Enums\SystemRole;
 use App\Modules\Roles\Models\Role;
 use Exception;
@@ -43,15 +45,15 @@ class RoleService extends BaseService
         });
     }
 
-    public function create(array $data): Role
+    public function create(CreateRoleDTO $dto): Role
     {
-        $role = DB::transaction(function () use ($data) {
+        $role = DB::transaction(function () use ($dto) {
             $role = Role::create([
-                'name' => $data['name'],
+                'name' => $dto->name,
                 'guard_name' => 'api'
             ]);
 
-            $this->syncRolePermissions($role, $data);
+            $this->syncRolePermissions($role, ['permissions' => $dto->permissions]);
 
             return $role;
         });
@@ -61,15 +63,15 @@ class RoleService extends BaseService
         return $role;
     }
 
-    public function update(Role $role, array $data): Role
+    public function update(Role $role, UpdateRoleDTO $dto): Role
     {
-        $updatedRole = DB::transaction(function () use ($role, $data) {
+        $updatedRole = DB::transaction(function () use ($role, $dto) {
             $role->update([
-                'name' => $data['name'],
+                'name' => $dto->name,
                 'guard_name' => 'api'
             ]);
 
-            $this->syncRolePermissions($role, $data);
+            $this->syncRolePermissions($role, ['permissions' => $dto->permissions]);
 
             return $role;
         });

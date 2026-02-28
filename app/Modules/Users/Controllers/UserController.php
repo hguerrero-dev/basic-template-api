@@ -3,6 +3,8 @@
 namespace App\Modules\Users\Controllers;
 
 use App\Modules\Core\Controllers\BaseController;
+use App\Modules\Users\DTOs\CreateUserDTO;
+use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Services\UserService;
 use App\Modules\Users\Requests\CreateUserRequest;
@@ -29,7 +31,7 @@ class UserController extends BaseController
         ]);
 
         return $this->successResponse([
-            'statuses' => $statuses,
+            'estados' => $statuses,
             'roles' => $roles
         ], 'Opciones de formulario obtenidas correctamente');
     }
@@ -67,8 +69,14 @@ class UserController extends BaseController
 
     public function store(CreateUserRequest $request): JsonResponse
     {
-        $data = $request->validated();
-        $user = $this->userService->create($data);
+        $dto = new CreateUserDTO(
+            $request->input('name'),
+            $request->input('email'),
+            $request->input('password'),
+            $request->input('username'),
+            $request->input('roles', [])
+        );
+        $user = $this->userService->create($dto);
 
         return $this->successResponse(
             new UserResource($user),
@@ -77,11 +85,18 @@ class UserController extends BaseController
         );
     }
 
+
     public function update($id, UpdateUserRequest $request): JsonResponse
     {
-        $data = $request->validated();
-
-        $user = $this->userService->update($id, $data);
+        $dto = new UpdateUserDTO(
+            $id,
+            $request->input('name'),
+            $request->input('email'),
+            $request->input('username'),
+            $request->input('roles', []),
+            $request->input('password')
+        );
+        $user = $this->userService->update($dto);
 
         return $this->successResponse(
             new UserResource($user),

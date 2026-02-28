@@ -4,6 +4,8 @@ namespace App\Modules\Users\Services;
 
 use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\Enums\SystemRole;
+use App\Modules\Users\DTOs\CreateUserDTO;
+use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Support\Facades\Cache;
@@ -59,41 +61,41 @@ class UserService extends BaseService
         return $user;
     }
 
-    public function create($data)
+    public function create(CreateUserDTO $dto)
     {
         $user = User::create([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'email' => $data['email'] ?? null,
-            'password' => $this->hashPassword($data['password']),
-            'status' => $data['status'] ?? UserStatus::Active,
+            'name' => $dto->name,
+            'username' => $dto->username,
+            'email' => $dto->email ?? null,
+            'password' => $this->hashPassword($dto->password),
+            'status' => UserStatus::Active,
         ]);
 
-        $this->manageRoles($user, $data['roles'] ?? []);
+        $this->manageRoles($user, $dto->roles);
 
         Cache::tags([User::CACHE_TAG])->flush();
 
         return $user;
     }
 
-    public function update($id, $data)
+    public function update(UpdateUserDTO $dto)
     {
-        $user = User::findOrFail($id);
+        $user = User::findOrFail($dto->id);
 
         $user->update([
-            'name' => $data['name'],
-            'username' => $data['username'],
-            'email' => $data['email'] ?? null,
-            'status' => $data['status'] ?? UserStatus::Active,
+            'name' => $dto->name,
+            'username' => $dto->username,
+            'email' => $dto->email ?? null,
+            'status' => UserStatus::Active,
         ]);
 
-        if (isset($data['password'])) {
+        if ($dto->password) {
             $user->update([
-                'password' => $this->hashPassword($data['password']),
+                'password' => $this->hashPassword($dto->password),
             ]);
         }
 
-        $this->manageRoles($user, $data['roles'] ?? []);
+        $this->manageRoles($user, $dto->roles);
 
         Cache::tags([User::CACHE_TAG])->flush();
 

@@ -9,6 +9,11 @@ use Spatie\Permission\Models\Role as SpatieRole;
 class Role extends SpatieRole implements Auditable
 {
     use HasAudit;
+
+    protected $primaryKey = 'id';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
     public const CACHE_TAG = 'roles';
     public const CACHE_KEY_LIST = 'roles_list';
     public const CACHE_KEY_DETAIL = 'role_detail';
