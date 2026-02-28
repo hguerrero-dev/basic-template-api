@@ -2,6 +2,7 @@
 
 use App\Modules\Core\Constants\MiddlewareAlias;
 use App\Modules\Core\Middleware\RoleRateLimiter;
+use App\Modules\Core\Middleware\SecureHeaders;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -22,11 +23,18 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/health'
     )
+
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             MiddlewareAlias::ROLE_RATE_LIMITER => RoleRateLimiter::class,
         ]);
+
+        // Middleware de seguridad para el grupo API
+        $middleware->group('api', [
+            SecureHeaders::class,
+        ]);
     })
+
     ->withExceptions(function (Exceptions $exceptions): void {
 
         // 1. Rate Limiting (429)
