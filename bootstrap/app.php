@@ -1,6 +1,7 @@
 <?php
 
 use App\Modules\Core\Constants\MiddlewareAlias;
+use App\Modules\Core\Middleware\ForceHttps;
 use App\Modules\Core\Middleware\RoleRateLimiter;
 use App\Modules\Core\Middleware\SecureHeaders;
 use Illuminate\Auth\AuthenticationException;
@@ -31,6 +32,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Middleware de seguridad para el grupo API
         $middleware->group('api', [
+            ForceHttps::class,
             SecureHeaders::class,
         ]);
     })
