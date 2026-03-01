@@ -55,9 +55,9 @@ class RoleController extends BaseController
         return $this->successResponse($role, 'Rol creado correctamente', 201);
     }
 
-    public function update(UpdateRoleRequest $request, Role $role): JsonResponse
+    public function update(UpdateRoleRequest $request, Role $role): \Illuminate\Http\JsonResponse
     {
-        dd($role->id);
+        dd($role->id, $role);
         $dto = new UpdateRoleDTO(
             $role->id,
             $request->input('name'),

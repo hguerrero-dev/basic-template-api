@@ -10,8 +10,8 @@ trait ApiResponse
     {
         return response()->json([
             'success' => true,
-            'mensaje' => $message,
-            'datos' => $data
+            'message' => $message,
+            'data' => $data
         ], $code);
     }
 
@@ -20,7 +20,7 @@ trait ApiResponse
         $response = [
             'success' => false,
             'error' => $errorCode,
-            'mensaje' => $message,
+            'message' => $message,
         ];
 
         if ($details) {
