@@ -4,6 +4,7 @@ use App\Modules\Core\Constants\MiddlewareAlias;
 use App\Modules\Core\Middleware\ForceHttps;
 use App\Modules\Core\Middleware\RoleRateLimiter;
 use App\Modules\Core\Middleware\SecureHeaders;
+use App\Modules\Core\Middleware\LogContext;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
@@ -28,10 +29,12 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             MiddlewareAlias::ROLE_RATE_LIMITER => RoleRateLimiter::class,
+            'log.context' => LogContext::class,
         ]);
 
-        // Middleware de seguridad para el grupo API
+        // => API Middleware Group - Add logging, security, and rate limiting
         $middleware->group('api', [
+            LogContext::class,
             ForceHttps::class,
             SecureHeaders::class,
         ]);
@@ -50,7 +53,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 2. Autenticación (401)
+        // 2. Authenticate (401)
         $exceptions->render(function (AuthenticationException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
@@ -61,7 +64,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 3. Permisos (403)
+        // 3. Permissions (403)
         $exceptions->render(function (AccessDeniedHttpException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
@@ -81,7 +84,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 4. Validación (422)
+        // 4. Validations (422)
         $exceptions->render(function (ValidationException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
@@ -93,7 +96,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 5. Recurso no encontrado (404)
+        // 5. Not Found resources (404)
         $exceptions->render(function (ModelNotFoundException|NotFoundHttpException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
@@ -104,7 +107,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 6. Método no permitido (405)
+        // 6. Method Not Allowed (405)
         $exceptions->render(function (MethodNotAllowedHttpException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
@@ -115,7 +118,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 7. Error de base de datos (500)
+        // 7. Database Error (500)
         $exceptions->render(function (QueryException $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([
@@ -127,7 +130,7 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // 8. Error genérico (500)
+        // 8. Generic Error (500)
         $exceptions->render(function (\Exception $e, Request $request) {
             if ($request->expectsJson() || $request->is('api/*')) {
                 return response()->json([

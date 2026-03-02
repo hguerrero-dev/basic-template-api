@@ -6,6 +6,7 @@ enum SystemRole: string
 {
     case SuperAdmin = 'super_admin';
     case Admin      = 'admin';
+    case User       = 'user';
     case Customer   = 'customer';
 
     /**
