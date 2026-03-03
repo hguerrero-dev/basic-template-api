@@ -69,7 +69,7 @@ return [
         'only_on_failure' => false,
 
         'mail' => [
-            'to' => 'your@example.com',
+            'to' => env('LOG_MAIL_TO', 'admin@ejemplo.com'),
 
             'from' => [
                 'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
@@ -78,7 +78,7 @@ return [
         ],
 
         'slack' => [
-            'webhook_url' => env('HEALTH_SLACK_WEBHOOK_URL', ''),
+            'webhook_url' => env('LOG_SLACK_WEBHOOK_URL', ''),
 
             /*
              * If this is set to null the default channel of the webhook will be used.

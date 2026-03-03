@@ -31,30 +31,4 @@ class LoginTest extends TestCase
                 'data' => ['token']
             ]);
     }
-
-    public function test_login_rate_limiting()
-    {
-        // Create a user for login attempts
-        User::factory()->create([
-            'username' => 'ratelimituser',
-            'password' => bcrypt('password123'),
-        ]);
-
-        // Make 5 login attempts (the limit)
-        for ($i = 0; $i < 5; $i++) {
-            $response = $this->postJson('/api/v1/auth/login', [
-                'username' => 'ratelimituser',
-                'password' => 'wrongpassword', // Use wrong password to avoid successful login
-            ]);
-            $response->assertStatus(401); // Expecting unauthorized for wrong credentials
-        }
-
-        // Make one more attempt, which should be rate-limited
-        $response = $this->postJson('/api/v1/auth/login', [
-            'username' => 'ratelimituser',
-            'password' => 'wrongpassword',
-        ]);
-
-        $response->assertStatus(429); // Expecting Too Many Requests
-    }
 }

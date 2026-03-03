@@ -76,10 +76,21 @@ return [
         'slack' => [
             'driver' => 'slack',
             'url' => env('LOG_SLACK_WEBHOOK_URL'),
-            'username' => env('LOG_SLACK_USERNAME', 'Laravel Log'),
+            'username' => env('LOG_SLACK_USER', 'Laravel Log'),
             'emoji' => env('LOG_SLACK_EMOJI', ':boom:'),
-            'level' => env('LOG_LEVEL', 'critical'),
+            'level' => env('LOG_LEVEL', 'error'),
             'replace_placeholders' => true,
+        ],
+
+        'mail_alerts' => [
+            'driver' => 'custom',
+            'via' => \App\Modules\Core\Logging\EmailLogger::class,
+            'level' => 'error',
+            'with' => [
+                'to' => env('LOG_MAIL_TO', 'admin@ejemplo.com'),
+                'subject' => '🚨 ¡Error Crítico en el API (' . env('APP_NAME', 'Laravel') . ')!',
+                'from' => env('MAIL_FROM_ADDRESS', 'noreply@ejemplo.com'),
+            ],
         ],
 
         'papertrail' => [
@@ -89,7 +100,7 @@ return [
             'handler_with' => [
                 'host' => env('PAPERTRAIL_URL'),
                 'port' => env('PAPERTRAIL_PORT'),
-                'connectionString' => 'tls://'.env('PAPERTRAIL_URL').':'.env('PAPERTRAIL_PORT'),
+                'connectionString' => 'tls://' . env('PAPERTRAIL_URL') . ':' . env('PAPERTRAIL_PORT'),
             ],
             'processors' => [PsrLogMessageProcessor::class],
         ],
