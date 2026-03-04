@@ -6,6 +6,7 @@ use App\Modules\Core\Controllers\BaseController;
 use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Enums\UserStatus;
+use App\Modules\Users\Models\User;
 use App\Modules\Users\Services\UserService;
 use App\Modules\Users\Requests\CreateUserRequest;
 use App\Modules\Users\Requests\UpdateUserRequest;
@@ -13,6 +14,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use App\Modules\Users\Resources\UserResource;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends BaseController
 {
@@ -110,5 +112,33 @@ class UserController extends BaseController
         $this->userService->delete($id);
 
         return $this->successResponse(null, 'Usuario eliminado correctamente');
+    }
+
+    public function uploadAvatar(Request $request, User $user)
+    {
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        // Si el usuario ya tiene un avatar, lo eliminamos de MinIO
+        if ($user->avatar) {
+            Storage::disk('minio')->delete($user->avatar);
+        }
+
+        // Subimos el nuevo archivo al disco 'minio' en la carpeta 'avatars'
+        $path = $request->file('avatar')->store('avatars', 'minio');
+
+        // Actualizamos el usuario
+        $user->update(['avatar' => $path]);
+
+        // Evitar el error P1013 del editor
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('minio');
+        $url = $disk->url($path);
+
+        return $this->successResponse([
+            'avatar_url' => $url,
+            'path' => $path
+        ], 'Avatar actualizado correctamente');
     }
 }

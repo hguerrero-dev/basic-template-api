@@ -23,4 +23,6 @@ Route::middleware(['auth:sanctum', MiddlewareAlias::LOG_CONTEXT, MiddlewareAlias
 
     Route::delete('/{user}', [UserController::class, 'destroy'])
         ->middleware('can:' . UserPermission::Delete->value);
+
+    Route::post('/{user}/avatar', [UserController::class, 'uploadAvatar']);
 });

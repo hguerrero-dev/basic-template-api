@@ -13,19 +13,19 @@ class RoleSeeder extends Seeder
     {
         $superAdmin = Role::firstOrCreate([
             'name' => SystemRole::SuperAdmin->value,
-            'guard_name' => 'api'
+            'guard_name' => 'web'
         ]);
 
         $superAdmin->syncPermissions(Permission::all());
 
         Role::firstOrCreate([
             'name' => SystemRole::Admin->value,
-            'guard_name' => 'api'
+            'guard_name' => 'web'
         ]);
 
         Role::firstOrCreate([
             'name' => SystemRole::Customer->value,
-            'guard_name' => 'api'
+            'guard_name' => 'web'
         ]);
     }
 }

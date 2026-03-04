@@ -1,0 +1,27 @@
+meta {
+  name: update user avatar
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{base_url}}users/019ca680-1768-716f-8835-177592271340/avatar
+  body: file
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Diosmed Abad Cordoba",
+    "username": "dcordoba"
+  }
+}
+
+body:file {
+  file: @file(/home/hguerrero/Imágenes/hector)
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

@@ -15,6 +15,7 @@
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.10.1",
         "league/flysystem-aws-s3-v3": "^3.0",
+        "livewire/livewire": "^4.2",
         "owen-it/laravel-auditing": "^14.0",
         "spatie/laravel-health": "^1.38",
         "spatie/laravel-permission": "^7.0"
