@@ -6,7 +6,7 @@ meta {
 
 post {
   url: {{base_url}}users/019ca680-1768-716f-8835-177592271340/avatar
-  body: file
+  body: multipartForm
   auth: inherit
 }
 
@@ -17,8 +17,12 @@ body:json {
   }
 }
 
+body:multipart-form {
+  avatar: @file(/home/hguerrero/Imágenes/hector)
+}
+
 body:file {
-  file: @file(/home/hguerrero/Imágenes/hector)
+  file: @file()
 }
 
 settings {
