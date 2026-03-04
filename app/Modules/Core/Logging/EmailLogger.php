@@ -6,27 +6,37 @@ use Monolog\Logger;
 use Monolog\LogRecord;
 use Monolog\Handler\AbstractProcessingHandler;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 
 class EmailLogger
 {
     public function __invoke(array $config)
     {
-        file_put_contents(storage_path('logs/debug_logger.txt'), "EmailLogger invoked!\n", FILE_APPEND);
-        $logger = new Logger('mail_alerts');
+        $logger = new Logger('email');
 
-        $handler = new class($config['level'] ?? Logger::ERROR) extends AbstractProcessingHandler {
+        $handler = new class($config['level'] ?? Logger::ERROR, $config) extends AbstractProcessingHandler {
+            private array $config;
+
+            public function __construct(int|string $level, array $config)
+            {
+                parent::__construct($level);
+                $this->config = $config;
+            }
+
             protected function write(LogRecord $record): void
             {
-                file_put_contents(storage_path('logs/debug_logger.txt'), "LogRecord trying to send!\n", FILE_APPEND);
                 try {
-                    // Envía el texto del error por correo plano
                     Mail::raw($record->formatted, function ($message) {
-                        $message->to(env('LOG_MAIL_TO'))
-                            ->subject('🚨 ¡Error Crítico en ' . env('APP_NAME') . '!');
+                        $to = $this->config['with']['to'] ?? 'admin@ejemplo.com';
+                        $subject = $this->config['with']['subject'] ?? 'Error Crítico';
+                        $from = $this->config['with']['from'] ?? 'noreply@ejemplo.com';
+
+                        $message->to($to)
+                            ->from($from)
+                            ->subject($subject);
                     });
                 } catch (\Throwable $e) {
-                    // Vamos a guardar el error de SMTP en un archivo de texto simple
-                    file_put_contents(storage_path('logs/smtp_error.txt'), $e->getMessage() . PHP_EOL, FILE_APPEND);
+                    Log::channel('single')->error('Error enviando alerta por email: ' . $e->getMessage());
                 }
             }
         };
