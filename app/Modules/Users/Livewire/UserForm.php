@@ -2,6 +2,7 @@
 
 namespace App\Modules\Users\Livewire;
 
+use App\Modules\Roles\Enums\SystemRole;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
@@ -12,6 +13,7 @@ use App\Modules\Users\DTOs\UpdateUserDTO;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
 use App\Modules\Users\Enums\UserPermission;
+use App\Modules\Users\Enums\UserStatus;
 
 class UserForm extends Component
 {
@@ -23,12 +25,44 @@ class UserForm extends Component
     public string $password_confirmation = '';
 
     public array $roles = [];
+    public array $previousRoles = [];
+    public $pendingSuperAdmin = false;
     public string $status = 'active';
 
     #[Computed]
     public function catalogs()
     {
         return app(UserService::class)->getFormOptions();
+    }
+
+    public function updatedRoles($value)
+    {
+        // Detecta si se agregó super_admin
+        if (
+            in_array(SystemRole::SuperAdmin, $this->roles) &&
+            !in_array(SystemRole::SuperAdmin, $this->previousRoles) &&
+            !$this->pendingSuperAdmin
+        ) {
+            // Quita el rol temporalmente
+            $this->roles = array_diff($this->roles, [SystemRole::SuperAdmin]);
+            $this->pendingSuperAdmin = true;
+
+            // Lanza el modal global
+            $this->dispatch('confirm', [
+                'title' => 'Confirmar selección',
+                'message' => '¿Estás seguro que deseas asignar el rol super administrador a este usuario?',
+                'onConfirm' => 'confirmSuperAdmin'
+            ]);
+        }
+
+        // Actualiza el array anterior
+        $this->previousRoles = $this->roles;
+    }
+
+    public function confirmSuperAdmin()
+    {
+        $this->roles[] = SystemRole::SuperAdmin;
+        $this->pendingSuperAdmin = false;
     }
 
     #[On('create-user')]
@@ -38,8 +72,9 @@ class UserForm extends Component
 
         $this->reset();
         $this->resetValidation();
-        // Fallback default value for array since reset() makes it empty natively, but let's be sure.
+
         $this->roles = [];
+        $this->previousRoles = $this->roles;
         $this->dispatch('open-modal', 'user-form-modal');
     }
 
@@ -60,8 +95,9 @@ class UserForm extends Component
         $this->password_confirmation = '';
 
         $this->status = $user->status?->value ?? 'active';
-        // Convert to array of names for the multiselect
+
         $this->roles = $user->roles->pluck('name')->toArray();
+        $this->previousRoles = $this->roles;
 
         $this->dispatch('open-modal', 'user-form-modal');
     }
@@ -73,7 +109,7 @@ class UserForm extends Component
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->userId)],
             'roles' => 'required|array|min:1',
             'roles.*' => 'string|exists:roles,name',
-            'status' => ['required', Rule::enum(\App\Modules\Users\Enums\UserStatus::class)]
+            'status' => ['required', Rule::enum(UserStatus::class)]
         ];
 
         if (!$this->userId || $this->password) {

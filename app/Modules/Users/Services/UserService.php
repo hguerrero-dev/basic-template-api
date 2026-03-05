@@ -81,10 +81,9 @@ class UserService extends BaseService
             'value' => $status->value,
         ], UserStatus::cases());
 
-        // We only fetch unique names to build the dropdown options. Distinct will ensure we don't duplicate customer.
-        $roles = Role::select('name')->distinct()->get()->map(fn($role) => [
-            'label' => ucfirst($role->name),
-            'value' => $role->name,
+        $roles = collect(SystemRole::cases())->map(fn($role) => [
+            'label' => ucfirst($role->value),
+            'value' => $role->value,
         ])->toArray();
 
         return [

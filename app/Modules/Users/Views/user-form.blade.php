@@ -20,7 +20,7 @@
                 <!-- Select de Rol -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Roles del Sistema</label>
-                    <x-ui.select-multiple 
+                    <x-ui.select-multiple
                         wire:model="roles" 
                         :options="$this->catalogs['roles']"
                         placeholder="Busca y selecciona roles..." 
