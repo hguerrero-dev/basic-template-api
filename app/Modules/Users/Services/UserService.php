@@ -15,8 +15,7 @@ class UserService extends BaseService
 {
     public function getAll(?string $search = null, ?int $perPage = null)
     {
-
-        $page = request()->input('page', 1);
+        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage('page') ?: 1;
         $perPage = $perPage ?? config('api.pagination.default', 15);
 
         $cacheKey = sprintf(
@@ -27,19 +26,18 @@ class UserService extends BaseService
             $page
         );
 
-        return Cache::tags([User::CACHE_TAG])->remember($cacheKey, 3600, function () use ($search, $perPage, $cacheKey) {
-            return $this->paginate(User::with('roles'), [
+        return $this->paginateAndCache(
+            User::with('roles'),
+            $cacheKey,
+            [User::CACHE_TAG],
+            3600,
+            [
                 'search' => $search,
                 'perPage' => $perPage,
-                'searchFields' => ['name', 'username', 'email']
-            ]);
-        });
-
-        return $this->paginate(User::with('roles'), [
-            'search' => $search,
-            'perPage' => $perPage,
-            'searchFields' => ['name', 'username', 'email']
-        ]);
+                'searchFields' => ['name', 'username', 'email'],
+                'page' => $page
+            ]
+        );
     }
 
     public function getByOne($id)
@@ -63,9 +61,10 @@ class UserService extends BaseService
 
     public function create(CreateUserDTO $dto)
     {
+        $username = $this->generateUniqueUsername($dto->name, $dto->email);
         $user = User::create([
             'name' => $dto->name,
-            'username' => $dto->username,
+            'username' => $username,
             'email' => $dto->email ?? null,
             'password' => $this->hashPassword($dto->password),
             'status' => UserStatus::Active,
@@ -84,7 +83,6 @@ class UserService extends BaseService
 
         $user->update([
             'name' => $dto->name,
-            'username' => $dto->username,
             'email' => $dto->email ?? null,
             'status' => UserStatus::Active,
         ]);
@@ -127,5 +125,21 @@ class UserService extends BaseService
         }
 
         return $password;
+    }
+
+    public function generateUniqueUsername(string $name, ?string $email = null): string
+    {
+        $baseString = $email ? explode('@', $email)[0] : $name;
+        $baseUsername = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $baseString));
+
+        $username = $baseUsername;
+        $counter = 1;
+
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username ?: 'user' . uniqid();
     }
 }

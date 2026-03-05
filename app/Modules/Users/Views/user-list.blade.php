@@ -20,8 +20,18 @@
     </div>
 
     <!-- Implementando tu nuevo componente global de Tabla -->
-    <x-ui.table>
-        <x-slot:headers>
+    <div wire:target="search, nextPage, previousPage, gotoPage" wire:loading.class="opacity-50 pointer-events-none transition-opacity duration-200" class="relative">
+        
+        <!-- Un pequeño spinner de carga centrado -->
+        <div wire:target="search, nextPage, previousPage, gotoPage" wire:loading class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
+            <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+        </div>
+
+        <x-ui.table>
+            <x-slot:headers>
             <x-ui.th>Usuario</x-ui.th>
             <x-ui.th>Email</x-ui.th>
             <x-ui.th class="text-right">Acciones</x-ui.th>
@@ -30,16 +40,26 @@
         @forelse($users as $user)
             <tr class="hover:bg-gray-50 transition-colors">
                 <x-ui.td class="font-medium text-gray-900">
-                    {{ $user->name ?? $user->username }}
+                    {{ is_array($user) ? ($user['name'] ?? $user['username']) : ($user->name ?? $user->username) }}
                 </x-ui.td>
                 
                 <x-ui.td>
-                    {{ $user->email }}
+                    {{ is_array($user) ? $user['email'] : $user->email }}
                 </x-ui.td>
                 
                 <x-ui.td class="text-right font-medium">
-                    <button wire:click="$dispatch('edit-user', { id: '{{ $user->id }}' })" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
-                    <button class="text-red-600 hover:text-red-900">Eliminar</button>
+                    <button wire:click="$dispatch('edit-user', { id: '{{ is_array($user) ? $user['id'] : $user->id }}' })" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                    <button 
+                        x-on:click="$dispatch('open-confirm', { 
+                            title: 'Eliminar Usuario', 
+                            message: '¿Estás seguro de que deseas eliminar a {{ is_array($user) ? ($user['name'] ?? $user['username']) : ($user->name ?? $user->username) }}?', 
+                            event: 'delete-user', 
+                            params: { id: '{{ is_array($user) ? $user['id'] : $user->id }}' } 
+                        })"
+                        class="text-red-600 hover:text-red-900"
+                    >
+                        Eliminar
+                    </button>
                 </x-ui.td>
             </tr>
         @empty
@@ -57,6 +77,7 @@
             </x-slot:pagination>
         @endif
     </x-ui.table>
+    </div>
 
     <!-- Componente Modal para crear / editar usuario -->
     <livewire:users.user-form />

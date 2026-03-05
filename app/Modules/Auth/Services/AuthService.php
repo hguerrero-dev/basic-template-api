@@ -34,7 +34,7 @@ class AuthService
 
     public function register(string $name, string $email, string $password)
     {
-        $username = $this->generateUniqueUsername($email);
+        $username = app(\App\Modules\Users\Services\UserService::class)->generateUniqueUsername($name, $email);
 
         $user = User::create([
             'name' => $name,
@@ -45,22 +45,6 @@ class AuthService
         ]);
 
         return $user;
-    }
-
-    private function generateUniqueUsername(string $email): string
-    {
-        $baseUsername = strtolower(explode('@', $email)[0]);
-        $baseUsername = preg_replace('/[^a-z0-9]/', '', $baseUsername);
-
-        $username = $baseUsername;
-        $counter = 1;
-
-        while (User::where('username', $username)->exists()) {
-            $username = $baseUsername . $counter;
-            $counter++;
-        }
-
-        return $username;
     }
 
     private function validateUserCredentials(string $identifier, string $password): User

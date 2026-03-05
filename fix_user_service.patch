@@ -1,0 +1,47 @@
+--- app/Modules/Users/Services/UserService.php
++++ app/Modules/Users/Services/UserService.php
+@@ -53,10 +53,10 @@
+     public function create(CreateUserDTO $dto)
+     {
++        $username = $this->generateUniqueUsername($dto->name, $dto->email);
+         $user = User::create([
+             'name' => $dto->name,
+-            'username' => $dto->username,
++            'username' => $username,
+             'email' => $dto->email ?? null,
+             'password' => $this->hashPassword($dto->password),
+             'status' => UserStatus::Active,
+         ]);
+@@ -69,13 +69,14 @@
+     public function update(UpdateUserDTO $dto)
+     {
+         $user = User::findOrFail($dto->id);
+ 
++        $dataToUpdate = [
++            'name' => $dto->name,
++            'email' => $dto->email ?? null,
++            'status' => UserStatus::Active,
++        ];
+         $user->update($dataToUpdate);
+ 
+         if ($dto->password) {
+@@ -103,4 +104,18 @@
+         return $password;
+     }
++
++    public function generateUniqueUsername(string $name, ?string $email = null): string
++    {
++        $baseString = $email ? explode('@', $email)[0] : $name;
++        $baseUsername = strtolower(preg_replace('/[^a-zA-Z0-9]/', '', $baseString));
++
++        $username = $baseUsername;
++        $counter = 1;
++
++        while (User::where('username', $username)->exists()) {
++            $username = $baseUsername . $counter;
++            $counter++;
++        }
++
++        return $username ?: 'user' . uniqid();
++    }
+ }

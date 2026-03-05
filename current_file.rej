@@ -1,0 +1,38 @@
+--- UserService.php
++++ UserService.php
+@@ -19,20 +19,25 @@
+             $page
+         );
+ 
+-        /* Comentado porque Redis y LengthAwarePaginator de Livewire fallan al c
+-achearse                                                                                /*
+-        return Cache::tags([User::CACHE_TAG])->remember($cacheKey, 3600, functio
+-n () use ($search, $perPage, $cacheKey) {                                                   return $this->paginate(User::with('roles'), [
++        // Guardamos en caché SÓLO la data cruda y el conteo (Evitando serializar LengthAwarePaginator que choca con /livewire/update)
++        $cachedData = Cache::tags([User::CACHE_TAG])->remember($cacheKey, 3600, function () use ($search, $perPage) {
++            $paginator = $this->paginate(User::with('roles'), [
+                 'search' => $search,
+                 'perPage' => $perPage,
+                 'searchFields' => ['name', 'username', 'email']
+             ]);
++
++            return [
++                'items' => $paginator->items(),
++                'total' => $paginator->total()
++            ];
+         });
+-        */
+ 
+-        return $this->paginate(User::with('roles'), [
+-            'search' => $search,
+-            'perPage' => $perPage,
+-            'searchFields' => ['name', 'username', 'email']
+-        ]);
++        return new \Illuminate\Pagination\LengthAwarePaginator(
++            $cachedData['items'],
++            $cachedData['total'],
++            $perPage,
++            $page,
++            ['path' => \Illuminate\Pagination\Paginator::resolveCurrentPath(), 'pageName' => 'page']
++        );
+     }

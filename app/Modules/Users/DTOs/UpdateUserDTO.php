@@ -8,7 +8,6 @@ class UpdateUserDTO
         public string $id,
         public ?string $name = null,
         public ?string $email = null,
-        public ?string $username = null,
         public array $roles = [],
         public ?string $password = null
     ) {}

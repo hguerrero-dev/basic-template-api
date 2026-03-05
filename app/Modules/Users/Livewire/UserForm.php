@@ -15,9 +15,9 @@ class UserForm extends Component
     public ?string $userId = null;
 
     public string $name = '';
-    public string $username = '';
     public string $email = '';
     public string $password = '';
+    public string $password_confirmation = '';
 
     #[On('create-user')]
     public function create()
@@ -37,9 +37,9 @@ class UserForm extends Component
         $user = User::findOrFail($id);
 
         $this->name = $user->name;
-        $this->username = $user->username;
         $this->email = $user->email;
-        $this->password = ''; // Don't populate the password
+        $this->password = '';
+        $this->password_confirmation = ''; // Don't populate the password
 
         $this->dispatch('open-modal', 'user-form-modal');
     }
@@ -48,12 +48,11 @@ class UserForm extends Component
     {
         $rules = [
             'name' => 'required|string|max:255',
-            'username' => ['required', 'string', 'max:255', Rule::unique('users', 'username')->ignore($this->userId)],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->userId)],
         ];
 
         if (!$this->userId || $this->password) {
-            $rules['password'] = 'required|string|min:8';
+            $rules['password'] = 'required|string|min:8|same:password_confirmation';
         }
 
         $this->validate($rules);
@@ -63,7 +62,6 @@ class UserForm extends Component
                 id: $this->userId,
                 name: $this->name,
                 email: $this->email,
-                username: $this->username,
                 password: $this->password ?: null
             );
             app(UserService::class)->update($dto);
@@ -71,8 +69,7 @@ class UserForm extends Component
             $dto = new CreateUserDTO(
                 name: $this->name,
                 email: $this->email,
-                password: $this->password,
-                username: $this->username
+                password: $this->password
             );
             app(UserService::class)->create($dto);
         }

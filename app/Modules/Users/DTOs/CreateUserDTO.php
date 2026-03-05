@@ -6,9 +6,8 @@ class CreateUserDTO
 {
     public function __construct(
         public string $name,
-        public ?string $email = null,
         public string $password,
-        public string $username,
+        public ?string $email = null,
         public array $roles = []
     ) {}
 }

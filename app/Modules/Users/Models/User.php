@@ -2,8 +2,6 @@
 
 namespace App\Modules\Users\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use App\Modules\Users\Enums\UserStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
@@ -15,6 +13,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use OwenIt\Auditing\Contracts\Auditable;
 use App\Modules\Core\Traits\HasAudit;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable implements Auditable
 {
@@ -66,5 +66,16 @@ class User extends Authenticatable implements Auditable
     protected static function newFactory()
     {
         return UserFactory::new();
+    }
+
+    /**
+     * Get and set the user's first name.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            get: fn(string $value) => mb_convert_case(mb_strtolower($value, 'UTF-8'), MB_CASE_TITLE, 'UTF-8'),
+            set: fn(string $value) => mb_convert_case(mb_strtolower($value, 'UTF-8'), MB_CASE_TITLE, 'UTF-8'),
+        );
     }
 }

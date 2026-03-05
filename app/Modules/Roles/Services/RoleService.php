@@ -16,7 +16,7 @@ class RoleService extends BaseService
 {
     public function getAll(?string $search = null, ?int $perPage = null)
     {
-        $page = request()->input('page', 1);
+        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage('page') ?: 1;
         $perPage = $perPage ?? config('api.pagination.default', 15);
 
         $cacheKey = sprintf(
@@ -27,13 +27,18 @@ class RoleService extends BaseService
             $page
         );
 
-        return Cache::tags([Role::CACHE_TAG])->remember($cacheKey, 3600, function () use ($search, $perPage) {
-            return $this->paginate(Role::with('permissions'), [
+        return $this->paginateAndCache(
+            Role::with('permissions'),
+            $cacheKey,
+            [Role::CACHE_TAG],
+            3600,
+            [
                 'search' => $search,
+                'page' => $page,
                 'perPage' => $perPage,
                 'searchFields' => ['name']
-            ]);
-        });
+            ]
+        );
     }
 
     public function getByOne($id)

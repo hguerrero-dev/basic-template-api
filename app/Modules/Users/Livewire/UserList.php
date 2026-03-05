@@ -23,6 +23,16 @@ class UserList extends Component
         $this->resetPage();
     }
 
+    #[On('delete-user')]
+    public function deleteUser(string $id)
+    {
+        $userService = app(UserService::class);
+        $userService->delete($id);
+
+        // Opcional: Puedes enviar un evento de notificación de éxito aquí
+        // $this->dispatch('notify', 'Usuario eliminado exitosamente');
+    }
+
     public function render(UserService $userService)
     {
         // Hacemos uso tu servicio existente, pasando la búsqueda y perPage (ej. 10)

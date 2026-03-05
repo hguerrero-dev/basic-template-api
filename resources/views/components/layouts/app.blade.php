@@ -32,6 +32,9 @@
         <!-- VISTA PARA INVITADOS (Login / Register) -->
         {{ $slot }}
     @endguest
+
+    <!-- Modal Global -->
+    <x-ui.confirm-modal />
     @livewireScripts
 </body>
 </html>
