@@ -11,25 +11,27 @@ class RoleSeeder extends Seeder
 {
     public function run(): void
     {
-        $guards = ['web', 'api'];
+        // 1. Super Admin es estríctamente WEB
+        $superAdmin = Role::firstOrCreate([
+            'name' => SystemRole::SuperAdmin->value,
+            'guard_name' => 'web'
+        ]);
+        $superAdmin->syncPermissions(Permission::where('guard_name', 'web')->get());
 
-        foreach ($guards as $guard) {
-            $superAdmin = Role::firstOrCreate([
-                'name' => SystemRole::SuperAdmin->value,
-                'guard_name' => $guard
-            ]);
+        // 2. Admin es estrictamente API (como solicitaste) y tiene todos sus permisos guard=api
+        $admin = Role::firstOrCreate([
+            'name' => SystemRole::Admin->value,
+            'guard_name' => 'api'
+        ]);
+        $admin->syncPermissions(Permission::where('guard_name', 'api')->get());
 
-            $superAdmin->syncPermissions(Permission::where('guard_name', $guard)->get());
-
-            Role::firstOrCreate([
-                'name' => SystemRole::Admin->value,
-                'guard_name' => $guard
-            ]);
-
-            Role::firstOrCreate([
-                'name' => SystemRole::Customer->value,
-                'guard_name' => $guard
-            ]);
-        }
+        // 3. Customer es estrictamente API también
+        Role::firstOrCreate([
+            'name' => SystemRole::Customer->value,
+            'guard_name' => 'api'
+        ]);
+        
+        // El día de mañana, si creas Soporte Técnico, decides aquí si es web o api
+        // Role::firstOrCreate(['name' => 'soporte_tecnico', 'guard_name' => 'web_o_api']);
     }
 }

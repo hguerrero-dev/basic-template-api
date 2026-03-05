@@ -4,6 +4,7 @@ namespace App\Modules\Users\Livewire;
 
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Attributes\Computed;
 use App\Modules\Users\Models\User;
 use App\Modules\Users\Services\UserService;
 use App\Modules\Users\DTOs\CreateUserDTO;
@@ -18,6 +19,15 @@ class UserForm extends Component
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+
+    public string $role = '';
+    public string $status = 'active';
+
+    #[Computed]
+    public function catalogs()
+    {
+        return app(UserService::class)->getFormOptions();
+    }
 
     #[On('create-user')]
     public function create()
@@ -39,7 +49,10 @@ class UserForm extends Component
         $this->name = $user->name;
         $this->email = $user->email;
         $this->password = '';
-        $this->password_confirmation = ''; // Don't populate the password
+        $this->password_confirmation = '';
+
+        $this->status = $user->status?->value ?? 'active';
+        $this->role = $user->roles->first()?->name ?? '';
 
         $this->dispatch('open-modal', 'user-form-modal');
     }
@@ -49,6 +62,9 @@ class UserForm extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->userId)],
+            'role' => 'required|string|exists:roles,name',
+            // Usamos el Enum directamente para evitar validar a mano y permitir todas tus opciones
+            'status' => ['required', Rule::enum(\App\Modules\Users\Enums\UserStatus::class)]
         ];
 
         if (!$this->userId || $this->password) {
@@ -62,6 +78,8 @@ class UserForm extends Component
                 id: $this->userId,
                 name: $this->name,
                 email: $this->email,
+                roles: [$this->role],
+                status: $this->status,
                 password: $this->password ?: null
             );
             app(UserService::class)->update($dto);
@@ -69,6 +87,8 @@ class UserForm extends Component
             $dto = new CreateUserDTO(
                 name: $this->name,
                 email: $this->email,
+                roles: [$this->role],
+                status: $this->status,
                 password: $this->password
             );
             app(UserService::class)->create($dto);

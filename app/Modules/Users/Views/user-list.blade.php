@@ -19,9 +19,7 @@
         </div>
     </div>
 
-    <!-- Implementando tu nuevo componente global de Tabla -->
     <div wire:target="search, nextPage, previousPage, gotoPage" wire:loading.class="opacity-50 pointer-events-none transition-opacity duration-200" class="relative">
-        
         <!-- Un pequeño spinner de carga centrado -->
         <div wire:target="search, nextPage, previousPage, gotoPage" wire:loading class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10">
             <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -32,63 +30,98 @@
 
         <x-ui.table>
             <x-slot:headers>
-            <x-ui.th>Nombre completo</x-ui.th>
-            <x-ui.th>Nombre de usuario</x-ui.th>
-            <x-ui.th>Email</x-ui.th>
-            <x-ui.th>Estado</x-ui.th>
-            <x-ui.th class="text-right">Acciones</x-ui.th>
-        </x-slot:headers>
+                <x-ui.th>Nombre completo</x-ui.th>
+                <x-ui.th>Nombre de usuario</x-ui.th>
+                <x-ui.th>Email</x-ui.th>
+                <x-ui.th>Roles</x-ui.th>
+                <x-ui.th>Estado</x-ui.th>
+                <x-ui.th class="text-right">Acciones</x-ui.th>
+            </x-slot:headers>
 
-        @forelse($users as $user)
-            <tr class="hover:bg-gray-50 transition-colors">
-                <x-ui.td class="font-medium text-gray-900">
-                    {{ is_array($user) ? ($user['name'] ?? $user['username']) : ($user->name ?? $user->username) }}
-                </x-ui.td>
+            @forelse($users as $user)
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <x-ui.td class="font-medium text-gray-900">
+                        {{ $user->name ?? $user->username }}
+                    </x-ui.td>
 
-                <x-ui.td>
-                    {{ is_array($user) ? $user['username'] : $user->username }}
-                </x-ui.td>
+                    <x-ui.td>
+                        {{ $user->username }}
+                    </x-ui.td>
 
-                <x-ui.td>
-                    {{ is_array($user) ? $user['email'] : $user->email }}
-                </x-ui.td>
-                
-                <x-ui.td class="text-right font-medium">
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        Activo
-                    </span>
-                </x-ui.td>
+                    <x-ui.td>
+                        {{ $user->email }}
+                    </x-ui.td>
 
-                <x-ui.td class="text-right font-medium">
-                    <button wire:click="$dispatch('edit-user', { id: '{{ is_array($user) ? $user['id'] : $user->id }}' })" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
-                    <button 
-                        x-on:click="$dispatch('open-confirm', { 
-                            title: 'Eliminar Usuario', 
-                            message: '¿Estás seguro de que deseas eliminar a {{ is_array($user) ? ($user['name'] ?? $user['username']) : ($user->name ?? $user->username) }}?', 
-                            event: 'delete-user', 
-                            params: { id: '{{ is_array($user) ? $user['id'] : $user->id }}' } 
-                        })"
-                        class="text-red-600 hover:text-red-900"
-                    >
-                        Eliminar
-                    </button>
-                </x-ui.td>
-            </tr>
-        @empty
-            <tr>
-                <x-ui.td colspan="3" class="py-10 text-center text-gray-500">
-                    No se encontraron usuarios.
-                </x-ui.td>
-            </tr>
-        @endforelse
+                    <x-ui.td> 
+                       @php
+                           $colors = [
+                               'bg-blue-100 text-blue-800',
+                               'bg-purple-100 text-purple-800',
+                               'bg-pink-100 text-pink-800',
+                               'bg-indigo-100 text-indigo-800',
+                               'bg-teal-100 text-teal-800',
+                               'bg-cyan-100 text-cyan-800',
+                               'bg-orange-100 text-orange-800',
+                           ];
+                       @endphp
+                       <!-- Mostrar los roles de forma más sencilla ahora que no hay duplicados por guards -->
+                       @foreach($user->roles as $role)
+                           @php
+                               // Asigna un color consistente basado en el nombre del rol
+                               $colorClass = $colors[abs(crc32($role->name)) % count($colors)];
+                           @endphp
+                           <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $colorClass }} mr-1">
+                               {{ $role->name }}
+                           </span>
+                       @endforeach
+                    </x-ui.td>
+                    
+                    <x-ui.td>
+                        @php
+                            $statusValue = $user->status instanceof \App\Modules\Users\Enums\UserStatus ? $user->status->value : $user->status;
+                            $statusClass = match($statusValue) {
+                                'active' => 'bg-green-100 text-green-800',
+                                'inactive' => 'bg-red-100 text-red-800',
+                                'pending' => 'bg-yellow-100 text-yellow-800',
+                                'banned' => 'bg-gray-100 text-gray-800',
+                                default => 'bg-gray-100 text-gray-800'
+                            };
+                        @endphp
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusClass }}">
+                            {{ ucfirst($statusValue) }}
+                        </span>
+                    </x-ui.td>
 
-        <!-- Paginación -->
-        @if($users->hasPages())
-            <x-slot:pagination>
-                {{ $users->links() }}
-            </x-slot:pagination>
-        @endif
-    </x-ui.table>
+                    <x-ui.td class="text-right font-medium">
+                        <button wire:click="$dispatch('edit-user', { id: '{{ $user->id }}' })" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                        <button 
+                            x-on:click="$dispatch('open-confirm', { 
+                                title: 'Eliminar Usuario', 
+                                message: '¿Estás seguro de que deseas eliminar a {{ $user->name ?? $user->username }}?', 
+                                event: 'delete-user', 
+                                params: { id: '{{ $user->id }}' } 
+                            })"
+                            class="text-red-600 hover:text-red-900"
+                        >
+                            Eliminar
+                        </button>
+                    </x-ui.td>
+                </tr>
+            @empty
+                <tr>
+                    <x-ui.td colspan="6" class="py-10 text-center text-gray-500">
+                        No se encontraron usuarios.
+                    </x-ui.td>
+                </tr>
+            @endforelse
+
+            <!-- Paginación -->
+            @if($users->hasPages())
+                <x-slot:pagination>
+                    {{ $users->links() }}
+                </x-slot:pagination>
+            @endif
+        </x-ui.table>
     </div>
 
     <!-- Componente Modal para crear / editar usuario -->

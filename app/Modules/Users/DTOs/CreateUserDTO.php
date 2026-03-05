@@ -8,6 +8,7 @@ class CreateUserDTO
         public string $name,
         public string $password,
         public ?string $email = null,
-        public array $roles = []
+        public array $roles = [],
+        public string $status = 'active'
     ) {}
 }

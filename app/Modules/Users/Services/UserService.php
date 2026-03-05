@@ -4,13 +4,13 @@ namespace App\Modules\Users\Services;
 
 use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\Enums\SystemRole;
-use App\Modules\Roles\Models\Role;
 use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class UserService extends BaseService
 {
@@ -67,9 +67,10 @@ class UserService extends BaseService
             'value' => $status->value,
         ], UserStatus::cases());
 
-        $roles = Role::get()->map(fn($role) => [
+        // We only fetch unique names to build the dropdown options. Distinct will ensure we don't duplicate customer.
+        $roles = Role::select('name')->distinct()->get()->map(fn($role) => [
             'label' => ucfirst($role->name),
-            'value' => $role->id,
+            'value' => $role->name,
         ])->toArray();
 
         return [
@@ -86,10 +87,10 @@ class UserService extends BaseService
             'username' => $username,
             'email' => $dto->email ?? null,
             'password' => $this->hashPassword($dto->password),
-            'status' => UserStatus::Active,
+            'status' => $dto->status,
         ]);
 
-        $this->manageRoles($user, $dto->roles);
+        $this->manageRoles($user, $dto->roles ?? []);
 
         Cache::tags([User::CACHE_TAG])->flush();
 
@@ -103,7 +104,7 @@ class UserService extends BaseService
         $user->update([
             'name' => $dto->name,
             'email' => $dto->email ?? null,
-            'status' => UserStatus::Active,
+            'status' => $dto->status,
         ]);
 
         if ($dto->password) {
@@ -112,7 +113,7 @@ class UserService extends BaseService
             ]);
         }
 
-        $this->manageRoles($user, $dto->roles);
+        $this->manageRoles($user, $dto->roles ?? []);
 
         Cache::tags([User::CACHE_TAG])->flush();
 
@@ -128,13 +129,16 @@ class UserService extends BaseService
 
     protected function manageRoles(User $user, array $roles)
     {
-        if ($roles) {
-            $user->syncRoles($roles);
-        } elseif ($user->roles()->count() === 0) {
-            $user->assignRole(SystemRole::Customer->value);
+        if (!empty($roles)) {
+            // Find all Role models matching the names provided across any guards
+            $roleModels = Role::whereIn('name', $roles)->get();
+            $user->syncRoles($roleModels);
+        } else {
+            // default customer fallback
+            $user->syncRoles([]);
         }
 
-        $user->touch(); // => Force update of updated_at to trigger model events and cache invalidation if roles are changed
+        $user->touch(); 
     }
 
     protected function hashPassword(string $password): string

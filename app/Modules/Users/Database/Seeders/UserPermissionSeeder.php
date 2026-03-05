@@ -10,15 +10,16 @@ class UserPermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $guards = ['web', 'api'];
-
-        foreach ($guards as $guard) {
-            foreach (UserPermission::cases() as $permission) {
-                Permission::firstOrCreate([
-                    'name' => $permission->value,
-                    'guard_name' => $guard
-                ]);
-            }
+        foreach (UserPermission::cases() as $permission) {
+            Permission::firstOrCreate([
+                'name' => $permission->value,
+                'guard_name' => 'web'
+            ]);
+            
+            Permission::firstOrCreate([
+                'name' => $permission->value,
+                'guard_name' => 'api'
+            ]);
         }
     }
 }

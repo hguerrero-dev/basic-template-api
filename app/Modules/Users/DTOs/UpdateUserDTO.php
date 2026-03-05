@@ -9,6 +9,7 @@ class UpdateUserDTO
         public ?string $name = null,
         public ?string $email = null,
         public array $roles = [],
+        public string $status = 'active',
         public ?string $password = null
     ) {}
 }

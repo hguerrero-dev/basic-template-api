@@ -27,18 +27,16 @@ class UserSeeder extends Seeder
             ]
         );
 
+        // Se le asigna el único que es WEB
         $superAdminWeb = Role::findByName(SystemRole::SuperAdmin->value, 'web');
-        $superAdminApi = Role::findByName(SystemRole::SuperAdmin->value, 'api');
-        
-        $admin->assignRole([$superAdminWeb, $superAdminApi]);
+        $admin->assignRole($superAdminWeb);
 
         // (Optional) create some regular users for testing
         if (app()->environment('local')) {
-            $customerWeb = Role::findByName(SystemRole::Customer->value, 'web');
             $customerApi = Role::findByName(SystemRole::Customer->value, 'api');
-
-            User::factory(10)->create()->each(function ($user) use ($customerWeb, $customerApi) {
-                $user->assignRole([$customerWeb, $customerApi]);
+            
+            User::factory(10)->create()->each(function ($user) use ($customerApi) {
+                $user->assignRole($customerApi);
             });
         }
     }

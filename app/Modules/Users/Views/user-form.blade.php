@@ -16,6 +16,31 @@
                 @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
 
+             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <!-- Select de Rol -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Rol del Sistema</label>
+                    <select wire:model="role" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2 bg-white">
+                        <option value="">Seleccione un rol...</option>
+                        @foreach($this->catalogs['roles'] as $catRole)
+                            <option value="{{ $catRole['value'] }}">{{ $catRole['label'] }}</option>
+                        @endforeach
+                    </select>
+                    @error('role') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+
+                <!-- Select de Estado -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Estado de Cuenta</label>
+                    <select wire:model="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2 bg-white">
+                        @foreach($this->catalogs['estados'] as $catEstado)
+                            <option value="{{ $catEstado['value'] }}">{{ $catEstado['label'] }}</option>
+                        @endforeach
+                    </select>
+                    @error('status') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <!-- Campo Contraseña -->
                 <div>
