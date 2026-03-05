@@ -10,11 +10,15 @@ class RolePermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        foreach (RolePermission::cases() as $permission) {
-            Permission::firstOrCreate([
-                'name' => $permission->value,
-                'guard_name' => 'web'
-            ]);
+        $guards = ['web', 'api'];
+
+        foreach ($guards as $guard) {
+            foreach (RolePermission::cases() as $permission) {
+                Permission::firstOrCreate([
+                    'name' => $permission->value,
+                    'guard_name' => $guard
+                ]);
+            }
         }
     }
 }

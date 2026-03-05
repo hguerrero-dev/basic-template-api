@@ -4,6 +4,7 @@ namespace App\Modules\Users\Services;
 
 use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\Enums\SystemRole;
+use App\Modules\Roles\Models\Role;
 use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Enums\UserStatus;
@@ -57,6 +58,24 @@ class UserService extends BaseService
         }
 
         return $user;
+    }
+
+    public function getFormOptions(): array
+    {
+        $statuses = array_map(fn($status) => [
+            'label' => ucfirst($status->value),
+            'value' => $status->value,
+        ], UserStatus::cases());
+
+        $roles = Role::get()->map(fn($role) => [
+            'label' => ucfirst($role->name),
+            'value' => $role->id,
+        ])->toArray();
+
+        return [
+            'estados' => $statuses,
+            'roles' => $roles
+        ];
     }
 
     public function create(CreateUserDTO $dto)

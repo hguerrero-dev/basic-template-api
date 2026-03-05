@@ -22,20 +22,12 @@ class UserController extends BaseController
 
     public function getFormOptions(): JsonResponse
     {
-        $statuses = array_map(fn($status) => [
-            'label' => ucfirst($status->value),
-            'value' => $status->value,
-        ], UserStatus::cases());
+        $options = $this->userService->getFormOptions();
 
-        $roles = Role::get()->map(fn($role) => [
-            'label' => ucfirst($role->name),
-            'value' => $role->id,
-        ]);
-
-        return $this->successResponse([
-            'estados' => $statuses,
-            'roles' => $roles
-        ], 'Opciones de formulario obtenidas correctamente');
+        return $this->successResponse(
+            $options,
+            'Opciones de formulario obtenidas correctamente'
+        );
     }
 
     public function me(Request $request)

@@ -32,8 +32,10 @@
 
         <x-ui.table>
             <x-slot:headers>
-            <x-ui.th>Usuario</x-ui.th>
+            <x-ui.th>Nombre completo</x-ui.th>
+            <x-ui.th>Nombre de usuario</x-ui.th>
             <x-ui.th>Email</x-ui.th>
+            <x-ui.th>Estado</x-ui.th>
             <x-ui.th class="text-right">Acciones</x-ui.th>
         </x-slot:headers>
 
@@ -42,11 +44,21 @@
                 <x-ui.td class="font-medium text-gray-900">
                     {{ is_array($user) ? ($user['name'] ?? $user['username']) : ($user->name ?? $user->username) }}
                 </x-ui.td>
-                
+
+                <x-ui.td>
+                    {{ is_array($user) ? $user['username'] : $user->username }}
+                </x-ui.td>
+
                 <x-ui.td>
                     {{ is_array($user) ? $user['email'] : $user->email }}
                 </x-ui.td>
                 
+                <x-ui.td class="text-right font-medium">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        Activo
+                    </span>
+                </x-ui.td>
+
                 <x-ui.td class="text-right font-medium">
                     <button wire:click="$dispatch('edit-user', { id: '{{ is_array($user) ? $user['id'] : $user->id }}' })" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
                     <button 

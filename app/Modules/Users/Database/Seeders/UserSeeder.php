@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Modules\Users\Models\User;
 use App\Modules\Roles\Enums\SystemRole;
 use App\Modules\Users\Enums\UserStatus;
+use Spatie\Permission\Models\Role;
 
 class UserSeeder extends Seeder
 {
@@ -26,12 +27,18 @@ class UserSeeder extends Seeder
             ]
         );
 
-        $admin->syncRoles(SystemRole::SuperAdmin->value);
+        $superAdminWeb = Role::findByName(SystemRole::SuperAdmin->value, 'web');
+        $superAdminApi = Role::findByName(SystemRole::SuperAdmin->value, 'api');
+        
+        $admin->assignRole([$superAdminWeb, $superAdminApi]);
 
         // (Optional) create some regular users for testing
         if (app()->environment('local')) {
-            User::factory(10)->create()->each(function ($user) {
-                $user->assignRole(SystemRole::Customer->value);
+            $customerWeb = Role::findByName(SystemRole::Customer->value, 'web');
+            $customerApi = Role::findByName(SystemRole::Customer->value, 'api');
+
+            User::factory(10)->create()->each(function ($user) use ($customerWeb, $customerApi) {
+                $user->assignRole([$customerWeb, $customerApi]);
             });
         }
     }
