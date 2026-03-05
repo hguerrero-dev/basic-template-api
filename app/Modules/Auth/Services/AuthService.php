@@ -41,7 +41,7 @@ class AuthService
             'email' => $email,
             'username' => $username,
             'password' => Hash::make($password),
-            'status' => UserStatus::Active, // change to Pending if you want email verification
+            'status' => UserStatus::Active,
         ]);
 
         return $user;

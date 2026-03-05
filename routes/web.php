@@ -15,6 +15,10 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/users', UserList::class)
         ->name('users.index')
         ->middleware('can:' . UserPermission::View->value);
+
+    Route::get('/roles', \App\Modules\Roles\Livewire\RoleList::class)
+        ->name('roles.index')
+        ->middleware('can:' . \App\Modules\Roles\Enums\RolePermission::View->value);
 });
 
 // Rutas de invitados (Login y Registro)
