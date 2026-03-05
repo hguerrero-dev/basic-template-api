@@ -6,7 +6,7 @@
         <div class="flex gap-2 w-full sm:w-auto">
             <input 
                 type="text" 
-                wire:model.live.debounce.300ms="search" 
+                wire:model.live.debounce.100ms="search" 
                 placeholder="Buscar usuario..." 
                 class="w-full sm:w-80 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 px-4 py-2 border"
             >

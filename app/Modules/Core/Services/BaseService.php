@@ -32,7 +32,7 @@ class BaseService
         if ($search && !empty($searchFields)) {
             $query->where(function ($q) use ($search, $searchFields) {
                 foreach ($searchFields as $field) {
-                    $q->orWhere($field, 'like', "%{$search}%");
+                    $q->orWhereRaw("LOWER($field) LIKE ?", ["%" . mb_strtolower($search, 'UTF-8') . "%"]);
                 }
             });
         }

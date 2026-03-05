@@ -8,6 +8,7 @@ use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Role;
@@ -16,8 +17,21 @@ class UserService extends BaseService
 {
     public function getAll(?string $search = null, ?int $perPage = null)
     {
-        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage('page') ?: 1;
+        $page = Paginator::resolveCurrentPage('page') ?: 1;
         $perPage = $perPage ?? config('api.pagination.default', 15);
+
+        $adminUsername = env('ADMIN_USERNAME', 'superadmin');
+
+        $query = User::with('roles')
+            ->where('username', '!=', $adminUsername);
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('LOWER(name) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(username) LIKE ?', ['%' . strtolower($search) . '%'])
+                    ->orWhereRaw('LOWER(email) LIKE ?', ['%' . strtolower($search) . '%']);
+            });
+        }
 
         $cacheKey = sprintf(
             '%s:s:%s:p:%s:pg:%s',
@@ -28,7 +42,7 @@ class UserService extends BaseService
         );
 
         return $this->paginateAndCache(
-            User::with('roles'),
+            $query,
             $cacheKey,
             [User::CACHE_TAG],
             3600,
@@ -138,7 +152,7 @@ class UserService extends BaseService
             $user->syncRoles([]);
         }
 
-        $user->touch(); 
+        $user->touch();
     }
 
     protected function hashPassword(string $password): string
