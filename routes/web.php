@@ -7,7 +7,7 @@ use App\Modules\Auth\Livewire\Register;
 // Cuando ya inicie sesión, entrará aquí (Dashboard temporal)
 Route::middleware('auth:web')->group(function () {
     Route::get('/', function () {
-        return "¡Iniciaste sesión con éxito! Bienvenido: " . auth()->user()->name;
+        return view('welcome-dashboard');
     })->name('dashboard');
 });
 

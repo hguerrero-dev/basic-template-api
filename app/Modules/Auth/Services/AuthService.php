@@ -32,6 +32,37 @@ class AuthService
         return $user;
     }
 
+    public function register(string $name, string $email, string $password)
+    {
+        $username = $this->generateUniqueUsername($email);
+
+        $user = User::create([
+            'name' => $name,
+            'email' => $email,
+            'username' => $username,
+            'password' => Hash::make($password),
+            'status' => UserStatus::Active, // change to Pending if you want email verification
+        ]);
+
+        return $user;
+    }
+
+    private function generateUniqueUsername(string $email): string
+    {
+        $baseUsername = strtolower(explode('@', $email)[0]);
+        $baseUsername = preg_replace('/[^a-z0-9]/', '', $baseUsername);
+
+        $username = $baseUsername;
+        $counter = 1;
+
+        while (User::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+
+        return $username;
+    }
+
     private function validateUserCredentials(string $identifier, string $password): User
     {
         $user = User::where('email', $identifier)
@@ -40,7 +71,7 @@ class AuthService
 
         if (!$user || !Hash::check($password, $user->password)) {
             throw ValidationException::withMessages([
-                'email' => ['Credenciales inválidas.'],
+                'identifier' => ['Credenciales inválidas.'],
             ]);
         }
 
@@ -52,7 +83,7 @@ class AuthService
                 default => 'No tienes acceso.',
             };
 
-            throw ValidationException::withMessages(['email' => [$mensaje]]);
+            throw ValidationException::withMessages(['identifier' => [$mensaje]]);
         }
 
         return $user;

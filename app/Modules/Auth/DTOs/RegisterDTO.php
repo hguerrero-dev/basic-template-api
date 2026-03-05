@@ -8,6 +8,6 @@ class RegisterDTO
         public string $name,
         public ?string $email = null,
         public string $password,
-        public string $username
+        public ?string $username = null
     ) {}
 }

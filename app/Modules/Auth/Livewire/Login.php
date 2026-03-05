@@ -8,25 +8,20 @@ use Illuminate\Validation\ValidationException;
 
 class Login extends Component
 {
-    public $email = '';
+    public $identifier = '';
     public $password = '';
 
     public function authenticate(AuthService $authService)
     {
         $this->validate([
-            'email' => 'required', // Quité la validación regex de email por si usa un username
+            'identifier' => 'required',
             'password' => 'required'
         ]);
 
         try {
-            // Llama a nuestro servicio modular avanzado (soporta banned, Inactive y login por email/usuario)
-            $authService->authenticateWeb($this->email, $this->password);
-            
-            // Si funciona, redirigimos (ajusta a /dashboard o /home)
+            $authService->authenticateWeb($this->identifier, $this->password);
             $this->redirect('/', navigate: true);
-
         } catch (ValidationException $e) {
-            // Pasamos los errores del AuthService al Frontend de Livewire
             foreach ($e->errors() as $key => $messages) {
                 $this->addError($key, $messages[0]);
             }

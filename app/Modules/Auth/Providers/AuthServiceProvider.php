@@ -3,6 +3,7 @@
 namespace App\Modules\Auth\Providers;
 
 use App\Modules\Auth\Livewire\Login;
+use App\Modules\Auth\Livewire\Logout;
 use App\Modules\Auth\Livewire\Register;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
@@ -17,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
         // 2. Registrar el componente Livewire
         Livewire::component('auth.login', Login::class);
         Livewire::component('auth.register', Register::class);
+        Livewire::component('auth.logout', Logout::class);
     }
 
     protected function registerRoutes(): void {}
