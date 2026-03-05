@@ -10,6 +10,8 @@ use App\Modules\Users\Services\UserService;
 use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Gate;
+use App\Modules\Users\Enums\UserPermission;
 
 class UserForm extends Component
 {
@@ -20,7 +22,7 @@ class UserForm extends Component
     public string $password = '';
     public string $password_confirmation = '';
 
-    public string $role = '';
+    public array $roles = [];
     public string $status = 'active';
 
     #[Computed]
@@ -32,14 +34,20 @@ class UserForm extends Component
     #[On('create-user')]
     public function create()
     {
+        Gate::authorize(UserPermission::Create->value);
+
         $this->reset();
         $this->resetValidation();
+        // Fallback default value for array since reset() makes it empty natively, but let's be sure.
+        $this->roles = [];
         $this->dispatch('open-modal', 'user-form-modal');
     }
 
     #[On('edit-user')]
     public function edit(string $id)
     {
+        Gate::authorize(UserPermission::Edit->value);
+
         $this->reset();
         $this->resetValidation();
 
@@ -52,7 +60,8 @@ class UserForm extends Component
         $this->password_confirmation = '';
 
         $this->status = $user->status?->value ?? 'active';
-        $this->role = $user->roles->first()?->name ?? '';
+        // Convert to array of names for the multiselect
+        $this->roles = $user->roles->pluck('name')->toArray();
 
         $this->dispatch('open-modal', 'user-form-modal');
     }
@@ -62,8 +71,8 @@ class UserForm extends Component
         $rules = [
             'name' => 'required|string|max:255',
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->userId)],
-            'role' => 'required|string|exists:roles,name',
-            // Usamos el Enum directamente para evitar validar a mano y permitir todas tus opciones
+            'roles' => 'required|array|min:1',
+            'roles.*' => 'string|exists:roles,name',
             'status' => ['required', Rule::enum(\App\Modules\Users\Enums\UserStatus::class)]
         ];
 
@@ -74,20 +83,24 @@ class UserForm extends Component
         $this->validate($rules);
 
         if ($this->userId) {
+            Gate::authorize(UserPermission::Edit->value);
+
             $dto = new UpdateUserDTO(
                 id: $this->userId,
                 name: $this->name,
                 email: $this->email,
-                roles: [$this->role],
+                roles: $this->roles,
                 status: $this->status,
                 password: $this->password ?: null
             );
             app(UserService::class)->update($dto);
         } else {
+            Gate::authorize(UserPermission::Create->value);
+
             $dto = new CreateUserDTO(
                 name: $this->name,
                 email: $this->email,
-                roles: [$this->role],
+                roles: $this->roles,
                 status: $this->status,
                 password: $this->password
             );

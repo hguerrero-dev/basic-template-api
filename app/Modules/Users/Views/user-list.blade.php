@@ -10,12 +10,14 @@
                 placeholder="Buscar usuario..." 
                 class="w-full sm:w-80 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 px-4 py-2 border"
             >
+            @can(\App\Modules\Users\Enums\UserPermission::Create->value)
             <button 
                 wire:click="$dispatch('create-user')"
                 class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md text-sm font-medium shadow-sm transition-colors"
             >
                 + Nuevo
             </button>
+            @endcan
         </div>
     </div>
 
@@ -64,10 +66,8 @@
                                'bg-orange-100 text-orange-800',
                            ];
                        @endphp
-                       <!-- Mostrar los roles de forma más sencilla ahora que no hay duplicados por guards -->
                        @foreach($user->roles as $role)
                            @php
-                               // Asigna un color consistente basado en el nombre del rol
                                $colorClass = $colors[abs(crc32($role->name)) % count($colors)];
                            @endphp
                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {{ $colorClass }} mr-1">
@@ -93,7 +93,11 @@
                     </x-ui.td>
 
                     <x-ui.td class="text-right font-medium">
+                        @can(\App\Modules\Users\Enums\UserPermission::Edit->value)
                         <button wire:click="$dispatch('edit-user', { id: '{{ $user->id }}' })" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                        @endcan
+
+                        @can(\App\Modules\Users\Enums\UserPermission::Delete->value)
                         <button 
                             x-on:click="$dispatch('open-confirm', { 
                                 title: 'Eliminar Usuario', 
@@ -105,6 +109,7 @@
                         >
                             Eliminar
                         </button>
+                        @endcan
                     </x-ui.td>
                 </tr>
             @empty

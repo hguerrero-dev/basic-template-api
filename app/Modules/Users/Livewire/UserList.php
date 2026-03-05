@@ -6,6 +6,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use App\Modules\Users\Services\UserService;
+use Illuminate\Support\Facades\Gate;
+use App\Modules\Users\Enums\UserPermission;
 
 class UserList extends Component
 {
@@ -26,16 +28,14 @@ class UserList extends Component
     #[On('delete-user')]
     public function deleteUser(string $id)
     {
+        Gate::authorize(UserPermission::Delete->value);
+
         $userService = app(UserService::class);
         $userService->delete($id);
-
-        // Opcional: Puedes enviar un evento de notificación de éxito aquí
-        // $this->dispatch('notify', 'Usuario eliminado exitosamente');
     }
 
     public function render(UserService $userService)
     {
-        // Hacemos uso tu servicio existente, pasando la búsqueda y perPage (ej. 10)
         $users = $userService->getAll($this->search, 10);
 
         return view('users::user-list', [
