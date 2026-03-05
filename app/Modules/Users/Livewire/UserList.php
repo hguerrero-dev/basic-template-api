@@ -4,6 +4,7 @@ namespace App\Modules\Users\Livewire;
 
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\On;
 use App\Modules\Users\Services\UserService;
 
 class UserList extends Component
@@ -13,6 +14,9 @@ class UserList extends Component
     protected $paginationTheme = 'tailwind';
 
     public $search = '';
+
+    #[On('user-saved')]
+    public function refreshTable() {}
 
     public function updatedSearch()
     {
