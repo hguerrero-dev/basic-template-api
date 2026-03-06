@@ -28,63 +28,66 @@
             </svg>
         </div>
         
-        <x-ui.table>
-            <x-slot:headers>
-                <x-ui.th>Nombre del Rol</x-ui.th>
-                <x-ui.th>Permisos</x-ui.th>
-                <x-ui.th class="text-right">Acciones</x-ui.th>
-            </x-slot:headers>
-    
+        <x-ui.card-grid>
             @forelse($roles as $role)
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <x-ui.td class="font-medium text-gray-900">
-                        {{ $role->name }}
-                    </x-ui.td>
+                <x-ui.card>
+                    <x-slot:title>
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                            {{ $role->name }}
+                        </div>
+                    </x-slot:title>
     
-                    <x-ui.td>
+                    <div class="mt-2 flex flex-wrap gap-1">
                         @foreach($role->permissions as $permission)
-                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mr-1 mb-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800">
                                 {{ $permission->name }}
                             </span>
                         @endforeach
-                    </x-ui.td>
+                        
+                        @if($role->permissions->isEmpty())
+                            <span class="text-gray-400 text-sm italic">Sin permisos asignados</span>
+                        @endif
+                    </div>
     
-                    <x-ui.td class="text-right">
-                        @can(\App\Modules\Roles\Enums\RolePermission::Edit->value)
-                        <button
-                            wire:click="$dispatch('edit-role', { id: {{ $role->id }} })"
-                            class="text-indigo-600 hover:text-indigo-900 text-sm font-medium"
-                        >
-                            Editar
-                        </button>
-                        @endcan
+                    <x-slot:footer>
+                        <div class="flex justify-end w-full gap-3">
+                            @can(\App\Modules\Roles\Enums\RolePermission::Edit->value)
+                            <button
+                                wire:click="$dispatch('edit-role', { id: {{ $role->id }} })"
+                                class="text-indigo-600 hover:text-indigo-900 text-sm font-medium transition-colors"
+                            >
+                                Editar
+                            </button>
+                            @endcan
     
-                        @can(\App\Modules\Roles\Enums\RolePermission::Delete->value)
-                        <button
-                            wire:click="$dispatch('delete-role', { id: {{ $role->id }} })"
-                            class="text-red-600 hover:text-red-900 text-sm font-medium ml-4"
-                        >
-                            Eliminar
-                        </button>
-                        @endcan
-                    </x-ui.td>
-                </tr>
+                            @can(\App\Modules\Roles\Enums\RolePermission::Delete->value)
+                            <button
+                                wire:click="$dispatch('delete-role', { id: {{ $role->id }} })"
+                                class="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
+                            >
+                                Eliminar
+                            </button>
+                            @endcan
+                        </div>
+                    </x-slot:footer>
+                </x-ui.card>
             @empty
-                <tr>
-                    <x-ui.td colspan="3" class="text-center text-gray-500 py-4">
-                        No se encontraron roles.
-                    </x-ui.td>
-                </tr>
+                <div class="col-span-1 sm:col-span-2 lg:col-span-3 xl:col-span-4 text-center text-gray-500 py-12 bg-white rounded-xl border border-gray-200 border-dashed">
+                    <svg class="mx-auto h-12 w-12 text-gray-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <p class="text-lg font-medium text-gray-900">No se encontraron roles</p>
+                    <p class="text-sm text-gray-500 mt-1">Ajusta tu búsqueda o crea un nuevo rol.</p>
+                </div>
             @endforelse
+        </x-ui.card-grid>
     
-            @if($roles->hasPages())
-                <tr>
-                    <x-ui.td colspan="3" class="px-6 py-4">
-                        {{ $roles->links() }}
-                    </x-ui.td>
-                </tr>
-            @endif
-        </x-ui.table>
+        @if($roles->hasPages())
+            <div class="mt-6">
+                {{ $roles->links() }}
+            </div>
+        @endif
     </div>
 
 </div>
