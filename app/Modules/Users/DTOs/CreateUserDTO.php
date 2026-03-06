@@ -2,6 +2,8 @@
 
 namespace App\Modules\Users\DTOs;
 
+use App\Modules\Users\Enums\UserStatus;
+
 class CreateUserDTO
 {
     public function __construct(
@@ -9,6 +11,6 @@ class CreateUserDTO
         public string $password,
         public ?string $email = null,
         public array $roles = [],
-        public string $status = 'active'
+        public string $status = UserStatus::Active->value
     ) {}
 }

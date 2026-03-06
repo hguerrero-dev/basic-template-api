@@ -11,8 +11,7 @@
 >
     <!-- Fondo oscuro (Overlay) -->
     <div 
-        x-show="show" 
-        x-transition.opacity
+        x-show="show"
         class="fixed inset-0 bg-gray-900 opacity-50" 
         @click="show = false"
     ></div>

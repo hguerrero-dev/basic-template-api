@@ -1,10 +1,11 @@
 <div 
     x-data="{ show: false, title: '', message: '', actionEvent: '', params: null }"
     x-on:open-confirm.window="
-        title = $event.detail.title;
-        message = $event.detail.message;
-        actionEvent = $event.detail.event;
-        params = $event.detail.params;
+        let data = Array.isArray($event.detail) ? $event.detail[0] : $event.detail;
+        title = data.title;
+        message = data.message;
+        actionEvent = data.event;
+        params = data.params;
         show = true;
     "
     x-show="show"
@@ -12,7 +13,7 @@
     class="fixed inset-0 z-100 overflow-y-auto"
 >
     <!-- Overlay oscuro -->
-    <div x-show="show" x-transition.opacity class="fixed inset-0 bg-gray-900 opacity-50" @click="show = false"></div>
+    <div x-show="show" class="fixed inset-0 bg-gray-900 opacity-50" @click="show = false"></div>
 
     <!-- Contenedor centrado -->
     <div x-show="show" x-transition class="flex min-h-full items-center justify-center p-4">

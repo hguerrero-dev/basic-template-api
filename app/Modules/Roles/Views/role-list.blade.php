@@ -63,7 +63,7 @@
     
                             @can(\App\Modules\Roles\Enums\RolePermission::Delete->value)
                             <button
-                                wire:click="$dispatch('delete-role', { id: {{ $role->id }} })"
+                                wire:click="confirmDelete('{{ $role->id }}', '{{ $role->name }}')"
                                 class="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
                             >
                                 Eliminar

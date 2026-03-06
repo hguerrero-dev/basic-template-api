@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Modules\Auth\Livewire\Login;
 use App\Modules\Auth\Livewire\Register;
+use App\Modules\Roles\Enums\RolePermission;
+use App\Modules\Roles\Livewire\RoleList;
 use App\Modules\Users\Enums\UserPermission;
 use App\Modules\Users\Livewire\UserList;
 
@@ -16,9 +18,9 @@ Route::middleware('auth:web')->group(function () {
         ->name('users.index')
         ->middleware('can:' . UserPermission::View->value);
 
-    Route::get('/roles', \App\Modules\Roles\Livewire\RoleList::class)
+    Route::get('/roles', RoleList::class)
         ->name('roles.index')
-        ->middleware('can:' . \App\Modules\Roles\Enums\RolePermission::View->value);
+        ->middleware('can:' . RolePermission::View->value);
 });
 
 // Rutas de invitados (Login y Registro)

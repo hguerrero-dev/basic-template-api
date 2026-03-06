@@ -23,6 +23,18 @@ class RoleList extends Component
         $this->resetPage();
     }
 
+    public function confirmDelete($id, $name)
+    {
+        Gate::authorize(RolePermission::Delete->value);
+
+        $this->dispatch('open-confirm', [
+            'title' => 'Eliminar Rol',
+            'message' => '¿Estás seguro de que deseas eliminar el rol: ' . $name . '?',
+            'event' => 'delete-role',
+            'params' => ['id' => $id]
+        ]);
+    }
+
     #[On('role-saved')]
     public function refreshTable() {}
 

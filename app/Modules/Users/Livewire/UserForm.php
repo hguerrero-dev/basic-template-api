@@ -35,34 +35,23 @@ class UserForm extends Component
         return app(UserService::class)->getFormOptions();
     }
 
-    public function updatedRoles($value)
+    public function tryAddRole($role)
     {
-        // Detecta si se agregó super_admin
-        if (
-            in_array(SystemRole::SuperAdmin, $this->roles) &&
-            !in_array(SystemRole::SuperAdmin, $this->previousRoles) &&
-            !$this->pendingSuperAdmin
-        ) {
-            // Quita el rol temporalmente
-            $this->roles = array_diff($this->roles, [SystemRole::SuperAdmin]);
+        if ($role === SystemRole::SuperAdmin->value && !$this->pendingSuperAdmin) {
             $this->pendingSuperAdmin = true;
-
-            // Lanza el modal global
-            $this->dispatch('confirm', [
-                'title' => 'Confirmar selección',
-                'message' => '¿Estás seguro que deseas asignar el rol super administrador a este usuario?',
-                'onConfirm' => 'confirmSuperAdmin'
-            ]);
+        } else {
+            $this->roles[] = $role;
+            $this->previousRoles = $this->roles;
         }
-
-        // Actualiza el array anterior
-        $this->previousRoles = $this->roles;
     }
 
     public function confirmSuperAdmin()
     {
-        $this->roles[] = SystemRole::SuperAdmin;
+        if (!in_array(SystemRole::SuperAdmin->value, $this->roles)) {
+            $this->roles[] = SystemRole::SuperAdmin->value;
+        }
         $this->pendingSuperAdmin = false;
+        $this->previousRoles = $this->roles;
     }
 
     #[On('create-user')]

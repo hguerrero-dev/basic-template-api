@@ -2,6 +2,8 @@
 
 namespace App\Modules\Users\DTOs;
 
+use App\Modules\Users\Enums\UserStatus;
+
 class UpdateUserDTO
 {
     public function __construct(
@@ -9,7 +11,7 @@ class UpdateUserDTO
         public ?string $name = null,
         public ?string $email = null,
         public array $roles = [],
-        public string $status = 'active',
+        public string $status = UserStatus::Active->value,
         public ?string $password = null
     ) {}
 }

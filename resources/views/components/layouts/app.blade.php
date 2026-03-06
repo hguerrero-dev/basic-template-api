@@ -7,7 +7,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
 </head>
-
 {{-- Script para manejar errores de Livewire --}}
 <script>
     document.addEventListener('livewire:init', () => {

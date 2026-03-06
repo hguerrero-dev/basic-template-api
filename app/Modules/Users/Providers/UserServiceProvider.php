@@ -3,7 +3,6 @@
 namespace App\Modules\Users\Providers;
 
 use App\Modules\Users\Livewire\UserForm;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 

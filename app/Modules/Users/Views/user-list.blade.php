@@ -94,17 +94,16 @@
 
                     <x-ui.td class="text-right font-medium">
                         @can(\App\Modules\Users\Enums\UserPermission::Edit->value)
-                        <button wire:click="$dispatch('edit-user', { id: '{{ $user->id }}' })" class="text-indigo-600 hover:text-indigo-900 mr-3">Editar</button>
+                        <button 
+                            wire:click="$dispatch('edit-user', { id: {{ json_encode($user->id) }} })" 
+                            class="text-indigo-600 hover:text-indigo-900 mr-3">
+                            Editar
+                        </button>
                         @endcan
 
                         @can(\App\Modules\Users\Enums\UserPermission::Delete->value)
                         <button 
-                            x-on:click="$dispatch('open-confirm', { 
-                                title: 'Eliminar Usuario', 
-                                message: '¿Estás seguro de que deseas eliminar a {{ $user->name ?? $user->username }}?', 
-                                event: 'delete-user', 
-                                params: { id: '{{ $user->id }}' } 
-                            })"
+                            wire:click="confirmDelete('{{ $user->id }}', '{{ $user->name ?? $user->username }}')"
                             class="text-red-600 hover:text-red-900"
                         >
                             Eliminar
@@ -131,5 +130,4 @@
 
     <!-- Componente Modal para crear / editar usuario -->
     <livewire:users.user-form />
-
 </div>

@@ -26,8 +26,20 @@ class UserList extends Component
         $this->resetPage();
     }
 
+    public function confirmDelete($id, $name)
+    {
+        Gate::authorize(UserPermission::Delete->value);
+
+        $this->dispatch('open-confirm', [
+            'title' => 'Eliminar Usuario',
+            'message' => '¿Estás seguro de que deseas eliminar al usuario: ' . $name . '?',
+            'event' => 'delete-user',
+            'params' => ['id' => $id]
+        ]);
+    }
+
     #[On('delete-user')]
-    public function deleteUser(string $id)
+    public function deleteUser($id)
     {
         Gate::authorize(UserPermission::Delete->value);
 
@@ -48,6 +60,7 @@ class UserList extends Component
             ]);
         }
     }
+
     public function render(UserService $userService)
     {
         $users = $userService->getAll($this->search, 10);

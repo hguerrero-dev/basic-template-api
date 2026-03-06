@@ -17,7 +17,7 @@ class CreateUserRequest extends BaseRequest
             'password' => ['required', 'string', 'min:8', 'confirmed'], // 'confirmed' espera password_confirmation
             'status'   => ['nullable', Rule::enum(UserStatus::class)],
             'roles' => ['nullable', 'array'],
-            'roles.*' => ['integer', 'exists:roles,id'],
+            'roles.*' => ['string', 'exists:roles,name'],
         ];
     }
 
