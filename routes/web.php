@@ -1,5 +1,7 @@
 <?php
 
+use App\Modules\Audit\Enums\AuditPermission;
+use App\Modules\Audit\Livewire\AuditList;
 use Illuminate\Support\Facades\Route;
 use App\Modules\Auth\Livewire\Login;
 use App\Modules\Auth\Livewire\Register;
@@ -21,6 +23,10 @@ Route::middleware('auth:web')->group(function () {
     Route::get('/roles', RoleList::class)
         ->name('roles.index')
         ->middleware('can:' . RolePermission::View->value);
+
+    Route::get('/audit', AuditList::class)
+        ->name('audit.index')
+        ->middleware('can:' . AuditPermission::View->value);
 });
 
 // Rutas de invitados (Login y Registro)

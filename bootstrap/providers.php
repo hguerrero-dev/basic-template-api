@@ -5,4 +5,5 @@ return [
     App\Modules\Users\Providers\UserServiceProvider::class,
     App\Modules\Auth\Providers\AuthServiceProvider::class,
     App\Modules\Roles\Providers\RoleServiceProvider::class,
+    App\Modules\Audit\Providers\AuditServiceProvider::class,
 ];

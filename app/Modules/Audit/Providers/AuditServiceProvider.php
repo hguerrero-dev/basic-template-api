@@ -9,7 +9,7 @@ class AuditServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // $this->loadViewsFrom(__DIR__ . '/../Views', 'audit');
+        $this->loadViewsFrom(__DIR__ . '/../Views', 'audit');
     }
 
     protected function registerRoutes(): void {}
