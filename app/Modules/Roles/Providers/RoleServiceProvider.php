@@ -2,7 +2,6 @@
 
 namespace App\Modules\Roles\Providers;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 
 class RoleServiceProvider extends ServiceProvider

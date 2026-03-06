@@ -1,19 +1,16 @@
 <?php
 
-namespace App\Modules\Roles\Database\Seeders;
+namespace App\Modules\Audit\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
-use App\Modules\Roles\Enums\RolePermission;
+use App\Modules\Audit\Enums\AuditPermission;
 
-class RolePermissionSeeder extends Seeder
+class AuditPermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        // Creamos los permisos tanto para web como para api.
-        // Web servirá para el super_admin.
-        // Api servirá para admin, customer, u otros roles futuros.
-        foreach (RolePermission::cases() as $permission) {
+        foreach (AuditPermission::cases() as $permission) {
             Permission::firstOrCreate([
                 'name' => $permission->value,
                 'guard_name' => 'web'

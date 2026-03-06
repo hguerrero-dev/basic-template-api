@@ -2,12 +2,13 @@
 
 namespace App\Modules\Roles\Services;
 
+use Exception;
+use App\Modules\Roles\Models\Role;
+use Illuminate\Pagination\Paginator;
 use App\Modules\Core\Services\BaseService;
 use App\Modules\Roles\DTOs\CreateRoleDTO;
 use App\Modules\Roles\DTOs\UpdateRoleDTO;
 use App\Modules\Roles\Enums\SystemRole;
-use App\Modules\Roles\Models\Role;
-use Exception;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Permission;
@@ -16,7 +17,7 @@ class RoleService extends BaseService
 {
     public function getAll(?string $search = null, ?int $perPage = null)
     {
-        $page = \Illuminate\Pagination\Paginator::resolveCurrentPage('page') ?: 1;
+        $page = Paginator::resolveCurrentPage('page') ?: 1;
         $perPage = $perPage ?? config('api.pagination.default', 15);
 
         $cacheKey = sprintf(

@@ -14,11 +14,21 @@ class AuthService
     {
         $user = $this->validateUserCredentials($identifier, $password);
 
+        $roles = $user->getRoleNames()->filter(function ($role) {
+            return str_starts_with($role, 'api_');
+        });
+
+        $permissions = $user->getAllPermissions()
+            ->pluck('name')
+            ->filter(function ($permission) {
+                return str_starts_with($permission, 'api_');
+            });
+
         return [
             'token' => $user->createToken('auth_token')->plainTextToken,
             'user' => $user,
-            'roles' => $user->getRoleNames(),
-            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'roles' => $roles->values(),
+            'permissions' => $permissions->values(),
         ];
     }
 
