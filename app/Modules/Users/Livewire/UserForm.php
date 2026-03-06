@@ -145,6 +145,11 @@ class UserForm extends Component
 
         $this->dispatch('close-modal', 'user-form-modal');
         $this->dispatch('user-saved');
+
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Usuario: ' . $this->name . ' ' . ($this->userId ? 'editado' : 'creado') . ' exitosamente.'
+        ]);
     }
 
     public function render()
