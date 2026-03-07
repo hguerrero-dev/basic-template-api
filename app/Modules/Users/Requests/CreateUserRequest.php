@@ -12,12 +12,11 @@ class CreateUserRequest extends BaseRequest
     {
         return [
             'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['nullable', 'email', 'unique:users,email'],
-            'username' => ['required', 'string', 'unique:users,username'],
+            'email'    => ['required', 'email', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8', 'confirmed'], // 'confirmed' espera password_confirmation
             'status'   => ['nullable', Rule::enum(UserStatus::class)],
             'roles' => ['nullable', 'array'],
-            'roles.*' => ['string', 'exists:roles,name'],
+            'roles.*' => ['integer', 'exists:roles,id'],
         ];
     }
 
@@ -25,7 +24,6 @@ class CreateUserRequest extends BaseRequest
     {
         return [
             'email.unique' => 'El correo electrónico ya está en uso.',
-            'username.unique' => 'El nombre de usuario ya está en uso.',
             'password.confirmed' => 'La confirmación de la contraseña no coincide.',
             'roles.*.exists' => 'Uno o más roles seleccionados no existen.',
         ];

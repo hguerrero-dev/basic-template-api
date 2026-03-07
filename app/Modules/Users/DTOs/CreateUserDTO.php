@@ -9,7 +9,7 @@ class CreateUserDTO
     public function __construct(
         public string $name,
         public string $password,
-        public ?string $email = null,
+        public string $email,
         public array $roles = [],
         public string $status = UserStatus::Active->value
     ) {}

@@ -67,7 +67,6 @@ class UserController extends BaseController
             $request->input('name'),
             $request->input('email'),
             $request->input('password'),
-            $request->input('username'),
             $request->input('roles', [])
         );
         $user = $this->userService->create($dto);
@@ -86,10 +85,11 @@ class UserController extends BaseController
             $id,
             $request->input('name'),
             $request->input('email'),
-            $request->input('username'),
             $request->input('roles', []),
+            $request->input('status', UserStatus::Active->value),
             $request->input('password')
         );
+
         $user = $this->userService->update($dto);
 
         return $this->successResponse(

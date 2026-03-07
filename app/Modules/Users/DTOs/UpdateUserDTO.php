@@ -11,7 +11,7 @@ class UpdateUserDTO
         public ?string $name = null,
         public ?string $email = null,
         public array $roles = [],
-        public string $status = UserStatus::Active->value,
+        public ?string $status = UserStatus::Active->value,
         public ?string $password = null
     ) {}
 }

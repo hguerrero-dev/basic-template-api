@@ -11,6 +11,7 @@ use App\Modules\Users\Models\User;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
 class UserService extends BaseService
@@ -149,11 +150,17 @@ class UserService extends BaseService
     protected function manageRoles(User $user, array $roles)
     {
         if (!empty($roles)) {
-            // Find all Role models matching the names provided across any guards
-            $roleModels = Role::whereIn('name', $roles)->get();
+            $firstRole = $roles[0];
+            $isId = is_numeric($firstRole) || Str::isUuid($firstRole);
+
+            if ($isId) {
+                $roleModels = Role::whereIn('id', $roles)->get();
+            } else {
+                $roleModels = Role::whereIn('name', $roles)->get();
+            }
+
             $user->syncRoles($roleModels);
         } else {
-            // default customer fallback
             $user->syncRoles([]);
         }
 
