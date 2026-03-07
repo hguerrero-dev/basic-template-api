@@ -41,6 +41,15 @@
                     class="w-full sm:w-auto rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 px-4 py-2 border"
                 >
             </div>
+
+            <!-- Botón para limpiar filtros -->
+            <button 
+                type="button"
+                wire:click="clearFilters"
+                class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-md text-sm font-medium shadow-sm transition-colors"
+            >
+                Limpiar
+            </button>
         </div>
     </div>
 

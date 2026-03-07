@@ -16,6 +16,12 @@ class AuditList extends Component
     public $dateFrom = '';
     public $dateTo = '';
 
+    public function clearFilters()
+    {
+        $this->reset(['search', 'event', 'dateFrom', 'dateTo']);
+        $this->resetPage();
+    }
+
     public function updatingSearch()
     {
         $this->resetPage();
