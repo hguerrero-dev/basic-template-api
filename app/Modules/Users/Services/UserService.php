@@ -136,6 +136,12 @@ class UserService extends BaseService
     public function delete($id)
     {
         $user = User::findOrFail($id);
+
+        User::updateOrCreate(
+            ['id' => $user->id],
+            ['status' => UserStatus::Inactive]
+        );
+
         $user->delete();
         Cache::tags([User::CACHE_TAG])->flush();
     }
