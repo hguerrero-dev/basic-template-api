@@ -12,10 +12,38 @@ class AuditList extends Component
 
     protected $paginationTheme = 'tailwind';
     public $search = '';
+    public $event = '';
+    public $dateFrom = '';
+    public $dateTo = '';
+
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+    public function updatingEvent()
+    {
+        $this->resetPage();
+    }
+    public function updatingDateFrom()
+    {
+        $this->resetPage();
+    }
+    public function updatingDateTo()
+    {
+        $this->resetPage();
+    }
 
     public function render(AuditService $auditService)
     {
-        $audits = $auditService->getAll($this->search, 10);
+
+        $filters = [
+            'search' => $this->search,
+            'event' => $this->event,
+            'date_from' => $this->dateFrom,
+            'date_to' => $this->dateTo
+        ];
+
+        $audits = $auditService->getAll($filters, 10);
 
         return view('audit::audit-list', [
             'audits' => $audits

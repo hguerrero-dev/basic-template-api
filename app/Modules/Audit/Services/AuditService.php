@@ -8,29 +8,65 @@ use Illuminate\Pagination\Paginator;
 
 class AuditService extends BaseService
 {
-    public function getAll(?string $search = null, ?int $perPage = null)
+    public function getAll(array $filters = [], ?int $perPage = null)
     {
         $page = Paginator::resolveCurrentPage('page') ?: 1;
         $perPage = $perPage ?? config('api.pagination.default', 15);
 
+
+        $search = $filters['search'] ?? null;
+        $event = $filters['event'] ?? null;
+        $dateFrom = $filters['date_from'] ?? null;
+        $dateTo = $filters['date_to'] ?? null;
+
         $cacheKey = sprintf(
-            '%s:s:%s:p:%s:pg:%s',
+            '%s:s:%s:e:%s:df:%s:dt:%s:p:%s:pg:%s',
             Audit::CACHE_KEY_LIST,
-            $search,
+            $search ?: 'all',
+            $event ?: 'all',
+            $dateFrom ?: 'all',
+            $dateTo ?: 'all',
             $perPage,
             $page
         );
 
+        $query = Audit::with('user', 'auditable');
+
+        if (!empty($search)) {
+            $query->where(function ($q) use ($search) {
+                $searchLower = mb_strtolower($search, 'UTF-8');
+                $q->whereRaw("LOWER(event::text) LIKE ?", ["%{$searchLower}%"])
+                    ->orWhereRaw("LOWER(ip_address::text) LIKE ?", ["%{$searchLower}%"])
+                    ->orWhereRaw("LOWER(auditable_type::text) LIKE ?", ["%{$searchLower}%"])
+                    ->orWhereExists(function ($sub) use ($searchLower) {
+                        $sub->select('id')
+                            ->from('users')
+                            ->whereRaw('users.id::text = audits.user_id::text')
+                            ->whereRaw("LOWER(users.name::text) LIKE ?", ["%{$searchLower}%"]);
+                    });
+            });
+        }
+
+        if (!empty($event)) {
+            $query->where('event', $event);
+        }
+
+        if (!empty($dateFrom)) {
+            $query->whereDate('created_at', '>=', $dateFrom);
+        }
+
+        if (!empty($dateTo)) {
+            $query->whereDate('created_at', '<=', $dateTo);
+        }
+
         return $this->paginateAndCache(
-            Audit::with('user', 'auditable'),
+            $query,
             $cacheKey,
             [Audit::CACHE_TAG],
             3600,
             [
-                'search' => $search,
                 'page' => $page,
                 'perPage' => $perPage,
-                'searchFields' => ['event', 'ip_address']
             ]
         );
     }

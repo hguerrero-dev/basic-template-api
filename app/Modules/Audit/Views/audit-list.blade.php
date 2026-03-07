@@ -2,13 +2,45 @@
     <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
         <h2 class="text-2xl font-bold text-gray-800">Auditoría de Actividades</h2>
         
-        <div class="flex gap-2 w-full sm:w-auto">
+        <div class="flex gap-4 w-full sm:w-auto items-center flex-wrap">
+
+            {{-- Filtro de búsqueda --}}
             <input 
                 type="text" 
-                wire:model.live.debounce.100ms="search" 
-                placeholder="Buscar actividad..." 
-                class="w-full sm:w-80 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 px-4 py-2 border"
+                placeholder="Buscar por usuario, modelo, etc..." 
+                wire:model.live="search" 
+                class="w-full sm:w-auto rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 px-4 py-2 border"
             >
+
+            {{-- Selector de acción --}}
+            <select wire:model.live="event" class="rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 px-4 py-2 border">
+                <option value="">Cualquier acción</option>
+                <option value="created">Creado</option>
+                <option value="updated">Actualizado</option>
+                <option value="deleted">Eliminado</option>
+            </select>
+
+            {{-- Filtro de fecha: Desde --}}
+            <div class="flex items-center gap-2">
+                <label for="dateFrom" class="text-sm font-medium text-gray-700">Desde:</label>
+                <input 
+                    type="date" 
+                    id="dateFrom"
+                    wire:model.live="dateFrom"
+                    class="w-full sm:w-auto rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 px-4 py-2 border"
+                >
+            </div>
+
+            {{-- Filtro de fecha: Hasta --}}
+            <div class="flex items-center gap-2">
+                <label for="dateTo" class="text-sm font-medium text-gray-700">Hasta:</label>
+                <input 
+                    type="date" 
+                    id="dateTo"
+                    wire:model.live="dateTo"
+                    class="w-full sm:w-auto rounded-md border-gray-300 text-sm shadow-sm focus:border-indigo-500 px-4 py-2 border"
+                >
+            </div>
         </div>
     </div>
 
@@ -26,6 +58,7 @@
                     <x-ui.th>Acción</x-ui.th>
                     <x-ui.th>Fecha y hora</x-ui.th>
                     <x-ui.th>Modelo auditado</x-ui.th>
+                     <x-ui.th class="text-right">Acciones</x-ui.th>
                 </x-slot:headers>
 
                 @forelse($audits as $audit)
@@ -49,7 +82,16 @@
                                 {{ class_basename($audit->auditable_type) }}: {{ $audit->auditable_id }} (Eliminado)
                             @endif
                         </x-ui.td>
-                        
+                        @can(\App\Modules\Audit\Enums\AuditPermission::View->value)
+                        <x-ui.td class="text-right">
+                            <button 
+                                wire:click="$dispatch('view-audit', { auditId: {{ $audit->id }} })"
+                                class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-md text-sm font-medium shadow-sm transition-colors"
+                            >
+                                Ver detalles
+                            </button>
+                        </x-ui.td>
+                        @endcan
                     </tr>
                 @empty
                     <tr>
