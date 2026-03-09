@@ -14,9 +14,18 @@ class RoleList extends Component
 {
     use WithPagination;
 
+    public string $guard = 'api';
+
     protected $paginationTheme = 'tailwind';
 
     public $search = '';
+
+    public function openRoleForm()
+    {
+        $this->dispatch('create-role');
+    }
+
+    // Elimina el método updatedGuard, ya no es necesario
 
     public function updatedSearch()
     {

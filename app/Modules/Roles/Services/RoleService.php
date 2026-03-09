@@ -110,23 +110,32 @@ class RoleService extends BaseService
         }
     }
 
-    public function getAllPermissionsGrouped()
+    public function getAllPermissionsGrouped(?string $guard = null)
     {
-        return Cache::tags([Role::CACHE_TAG_PERMISSIONS])->remember(Role::CACHE_KEY_PERMISSIONS_GROUPED, 86400, function () {
-            return Permission::all()
-                ->map(function ($permission) {
-                    $permission->group_name = explode('.', $permission->name)[0];
-                    return $permission;
-                })
-                ->groupBy('group_name')
-                ->map(function ($group) {
-                    return $group->map(function ($p) {
-                        return [
-                            'id' => $p->id,
-                            'name' => $p->name,
-                        ];
+        return Cache::tags([Role::CACHE_TAG_PERMISSIONS])->remember(
+            Role::CACHE_KEY_PERMISSIONS_GROUPED . ($guard ? ":$guard" : ''),
+            86400,
+            function () use ($guard) {
+                $query = Permission::query();
+                if ($guard) {
+                    $query->where('guard_name', $guard);
+                }
+                return $query->get()
+                    ->map(function ($permission) {
+                        $permission->group_name = explode('.', $permission->name)[0];
+                        return $permission;
+                    })
+                    ->groupBy('group_name')
+                    ->map(function ($group) {
+                        return $group->map(function ($p) {
+                            return [
+                                'id' => $p->id,
+                                'name' => $p->name,
+                                'guard_name' => $p->guard_name,
+                            ];
+                        });
                     });
-                });
-        });
+            }
+        );
     }
 }
