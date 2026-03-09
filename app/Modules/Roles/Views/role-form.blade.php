@@ -11,9 +11,7 @@
 
             <div>
                 <label class="block text-sm font-medium text-gray-700">Descripción del Rol</label>
-                <textarea type="text" wire:model="description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2" placeholder="Descripción del rol...">
-
-                </textarea>
+                <textarea type="text" wire:model="description" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2" placeholder="Descripción del rol..."></textarea>
             </div>
 
              <div class="space-y-4">
@@ -31,14 +29,28 @@
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Permisos del Rol</label>
-                    <x-ui.select-multiple
-                        wire:model="permissions"
-                        :options="$permissionsCatalog"
-                        option-label="name"
-                        option-value="id"
-                        placeholder="Busca y selecciona permisos..."
-                    />
-                    @error('permissions') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    <div x-data="{ guard: @entangle('guard') }">
+                        <div x-show="guard === 'api'">
+                            <x-ui.select-multiple
+                                wire:model="permissionsApi"
+                                :options="$permissionsCatalogApi"
+                                option-label="name"
+                                option-value="id"
+                                placeholder="Busca y selecciona permisos API..."
+                            />
+                        </div>
+                        <div x-show="guard === 'web'">
+                            <x-ui.select-multiple
+                                wire:model="permissionsWeb"
+                                :options="$permissionsCatalogWeb"
+                                option-label="name"
+                                option-value="id"
+                                placeholder="Busca y selecciona permisos WEB..."
+                            />
+                        </div>
+                    </div>
+                    @error('permissionsApi') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    @error('permissionsWeb') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
             </div>
 

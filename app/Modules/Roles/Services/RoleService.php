@@ -56,7 +56,7 @@ class RoleService extends BaseService
         $role = DB::transaction(function () use ($dto) {
             $role = Role::create([
                 'name' => $dto->name,
-                'guard_name' => 'api'
+                'guard_name' => $dto->guard_name
             ]);
 
             $this->syncRolePermissions($role, ['permissions' => $dto->permissions]);
@@ -73,11 +73,13 @@ class RoleService extends BaseService
     {
         $updatedRole = DB::transaction(function () use ($role, $dto) {
             $role->update([
-                'name' => $dto->name,
-                'guard_name' => 'api'
+                'name' => $dto->name ?? $role->name,
+                'guard_name' => $dto->guard_name ?? $role->guard_name
             ]);
 
-            $this->syncRolePermissions($role, ['permissions' => $dto->permissions]);
+            if (isset($dto->permissions)) {
+                $this->syncRolePermissions($role, ['permissions' => $dto->permissions]);
+            }
 
             return $role;
         });

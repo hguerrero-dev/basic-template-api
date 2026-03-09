@@ -82,9 +82,9 @@ class UserService extends BaseService
             'value' => $status->value,
         ], UserStatus::cases());
 
-        $roles = collect(SystemRole::cases())->map(fn($role) => [
-            'label' => ucfirst($role->value),
-            'value' => $role->value,
+        $roles = Role::all()->map(fn($role) => [
+            'label' => ucfirst($role->name) . ' (' . $role->guard_name . ')',
+            'value' => $role->name,
         ])->toArray();
 
         return [
