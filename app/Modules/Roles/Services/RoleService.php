@@ -56,6 +56,7 @@ class RoleService extends BaseService
         $role = DB::transaction(function () use ($dto) {
             $role = Role::create([
                 'name' => $dto->name,
+                'description' => $dto->description,
                 'guard_name' => $dto->guard_name
             ]);
 
@@ -69,11 +70,14 @@ class RoleService extends BaseService
         return $role;
     }
 
-    public function update(Role $role, UpdateRoleDTO $dto): Role
+    public function update(UpdateRoleDTO $dto): Role
     {
+        $role = Role::findOrFail($dto->id);
+
         $updatedRole = DB::transaction(function () use ($role, $dto) {
             $role->update([
                 'name' => $dto->name ?? $role->name,
+                'description' => $dto->description ?? $role->description,
                 'guard_name' => $dto->guard_name ?? $role->guard_name
             ]);
 
@@ -107,7 +111,13 @@ class RoleService extends BaseService
     protected function syncRolePermissions(Role $role, array $data): void
     {
         if (isset($data['permissions'])) {
-            $role->syncPermissions($data['permissions']);
+            // Retrieve permissions using their ID. Since syncPermissions accepts IDs if provided numerically.
+            // Spatie handles integer IDs by extracting them natively, but if the guard isn't matched perfectly, it errors out.
+            // Explicitly fetching models ensures we attach correct permissions for that guard to sidestep Spatie string quirks.
+            $numericIds = array_map('intval', $data['permissions']);
+            $permissionsToSync = Permission::whereIn('id', $numericIds)->where('guard_name', $role->guard_name)->get();
+
+            $role->syncPermissions($permissionsToSync);
             Cache::tags([Role::CACHE_TAG_PERMISSIONS])->flush();
         }
     }

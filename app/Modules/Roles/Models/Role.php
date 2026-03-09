@@ -10,6 +10,8 @@ class Role extends SpatieRole implements Auditable
 {
     use HasAudit;
 
+    protected $fillable = ['name', 'description', 'guard_name', 'updated_at', 'created_at'];
+
     protected $primaryKey = 'id';
     public $incrementing = true;
     protected $keyType = 'int';
