@@ -89,5 +89,7 @@
             </div>
         @endif
     </div>
-
+    
+    <!-- Componente Modal para crear/editar roles -->
+    <livewire:roles.role-form />
 </div>
