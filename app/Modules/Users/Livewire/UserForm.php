@@ -14,6 +14,7 @@ use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
 use App\Modules\Users\Enums\UserPermission;
 use App\Modules\Users\Enums\UserStatus;
+use Illuminate\Support\Str;
 
 class UserForm extends Component
 {
@@ -52,6 +53,67 @@ class UserForm extends Component
         }
         $this->pendingSuperAdmin = false;
         $this->previousRoles = $this->roles;
+    }
+
+    public function generateEmail()
+    {
+        if (trim($this->name) === '') {
+            $this->addError('name', 'El nombre es requerido para generar el email.');
+            return;
+        }
+
+        $cleanName = Str::slug($this->name, ' ');
+        $parts = explode(' ', strtolower($cleanName));
+
+        if (count($parts) < 2) {
+            $this->addError('name', 'Se requiere al menos un nombre y un apellido.');
+            return;
+        }
+
+        $firstName = $parts[0];
+        $lastName = end($parts);
+
+        $lettersToTake = 1;
+        $maxLetters = strlen($firstName);
+        $domain = '@mingob.gob.pa'; // => Change this to your desired domain
+        $generatedEmail = '';
+        $isUnique = false;
+
+        while (!$isUnique) {
+            $prefix = substr($firstName, 0, $lettersToTake);
+            $alias = $prefix . $lastName;
+            $generatedEmail = $alias . $domain;
+
+            $exists = User::where('email', $generatedEmail)->exists();
+
+            if (!$exists) {
+                $isUnique = true;
+            } else {
+                if ($lettersToTake < $maxLetters) {
+                    $lettersToTake++;
+                } else {
+                    $number = rand(10, 99);
+                    $generatedEmail = $alias . $number . $domain;
+                    while (User::where('email', $generatedEmail)->exists()) {
+                        $number++;
+                        $generatedEmail = $alias . $number . $domain;
+                    }
+                    $isUnique = true;
+                }
+            }
+        }
+
+        $this->email = $generatedEmail;
+        $this->resetErrorBag('name'); // Clear name errors if email generation is successful
+    }
+
+    public function generatePassword()
+    {
+        // => Generate a random password with 12 characters, including letters and numbers, but no symbols
+        $generatedPassword = Str::password(12, true, true, true, false);
+
+        $this->password = $generatedPassword;
+        $this->password_confirmation = $generatedPassword;
     }
 
     #[On('create-user')]

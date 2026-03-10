@@ -12,7 +12,20 @@
             <!-- Campo Email -->
             <div>
                 <label class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
-                <input type="email" wire:model="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
+                <div class="flex gap-2 relative mt-1">
+                    <input type="email" wire:model="email" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
+                    
+                    @if(!$userId)
+                        <button 
+                            type="button"
+                            wire:click="generateEmail" 
+                            class="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors whitespace-nowrap"
+                        >
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            Generar Email
+                        </button>
+                    @endif
+                </div>
                 @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
 
@@ -41,24 +54,53 @@
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <!-- Campo Contraseña -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        Contraseña 
-                        @if($userId) <span class="text-gray-400 font-normal">(Vacío para omitir)</span> @endif
+            <!-- Contenedor general de Password -->
+            <div x-data="{ showPassword: false }" class="space-y-4 pt-2 border-t border-gray-100">
+                
+                <!-- Encabezado y Botón Generar -->
+                <div class="flex justify-between items-center {{ $userId ? 'opacity-50 pointer-events-none' : '' }}">
+                    <label class="block text-sm font-semibold text-gray-800">
+                        Credenciales de Acceso
                     </label>
-                    <input type="password" wire:model="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
-                    @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    <button 
+                        type="button"
+                        wire:click="generatePassword" 
+                        class="flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-xs font-medium transition-colors"
+                    >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        Generar Aleatoria
+                    </button>
+                </div>    
+
+                <!-- Inputs de Password -->
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 relative">
+                    <!-- Campo Contraseña -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Contraseña 
+                            @if($userId) <span class="text-gray-400 font-normal">(Vacío para omitir)</span> @endif
+                        </label>
+                        <input x-bind:type="showPassword ? 'text' : 'password'" wire:model.live="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
+                        @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    </div>
+                    
+                    <!-- Campo Confirmación -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700">
+                            Confirmar Contraseña 
+                        </label>
+                        <input x-bind:type="showPassword ? 'text' : 'password'" wire:model.live="password_confirmation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
+                        @error('password_confirmation') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    </div>
+                    
                 </div>
                 
-                <!-- Campo Confirmación -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">
-                        Confirmar Contraseña 
+                <!-- Mostrar contraseña generada -->
+                <div class="flex items-center justify-end mt-2">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="checkbox" x-model="showPassword" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-4 w-4">
+                        <span class="ml-2 text-sm text-gray-600">Mostrar contraseña</span>
                     </label>
-                    <input type="password" wire:model="password_confirmation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
-                    @error('password_confirmation') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
             </div>
 
