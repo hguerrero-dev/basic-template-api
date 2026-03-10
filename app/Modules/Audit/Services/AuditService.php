@@ -59,6 +59,8 @@ class AuditService extends BaseService
             $query->whereDate('created_at', '<=', $dateTo);
         }
 
+        $query->orderBy('created_at', 'desc');
+
         return $this->paginateAndCache(
             $query,
             $cacheKey,

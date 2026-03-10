@@ -20,11 +20,35 @@
                     <label class="block text-sm font-medium text-gray-700">Guard del Rol</label>
                 </div>
 
-                <div class="block text-sm font-medium text-gray-700">
+                <div x-data="{ localGuard: @entangle('guard') }" class="block text-sm font-medium text-gray-700">
                     <select wire:model="guard" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
-                        <option value="api">API</option>
-                        <option value="web">WEB</option>
+                        <option value="api">
+                            API
+                        </option>
+                        <option value="web" hover:bg-blue-900>
+                            WEB
+                        </option>
                     </select>
+
+                     <!-- Card de información para API -->
+                    <div x-show="localGuard === 'api'" x-transition class="mt-3 p-3 bg-indigo-50 border border-indigo-200 rounded-md shadow-sm flex items-start">
+                        <svg class="h-5 w-5 text-indigo-400 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-xs text-indigo-700 font-normal mt-0.5">
+                            <strong class="font-semibold">Contexto API:</strong> Este acceso se utiliza para rutas autenticadas mediante tokens (como Laravel Sanctum). Ideal para aplicaciones frontend (React/Vue) o móviles.
+                        </p>
+                    </div>
+
+                    <!-- Card de información para WEB -->
+                    <div x-show="localGuard === 'web'" x-transition class="mt-3 p-3 bg-emerald-50 border border-emerald-200 rounded-md shadow-sm flex items-start" style="display: none;">
+                        <svg class="h-5 w-5 text-emerald-400 mr-2 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p class="text-xs text-emerald-700 font-normal mt-0.5">
+                            <strong class="font-semibold">Contexto WEB:</strong> Este acceso se utiliza para la navegación tradicional basada en cookies de sesión. Ideal para vistas renderizadas por servidor como esta.
+                        </p>
+                    </div>
                 </div>
 
                 <div>

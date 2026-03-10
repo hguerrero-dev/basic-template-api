@@ -94,7 +94,7 @@
                         @can(\App\Modules\Audit\Enums\AuditPermission::View->value)
                         <x-ui.td class="text-right">
                             <button 
-                                wire:click="$dispatch('view-audit', { auditId: {{ $audit->id }} })"
+                                wire:click="openAuditDetails({{ $audit->id }})"
                                 class="bg-gray-600 hover:bg-gray-700 text-white px-3 py-1 rounded-md text-sm font-medium shadow-sm transition-colors"
                             >
                                 Ver detalles
@@ -118,4 +118,6 @@
                 @endif
             </x-ui.table>
     </div>
+
+    @include('audit::audit-details')
 </div>
