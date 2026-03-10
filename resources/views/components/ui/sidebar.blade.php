@@ -36,5 +36,10 @@
             Auditoría
         </a>
         @endcan
+
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded text-slate-300 hover:text-white hover:bg-slate-700 transition-colors"> 
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            Catalogos
+        </a>
     </nav>
 </aside>

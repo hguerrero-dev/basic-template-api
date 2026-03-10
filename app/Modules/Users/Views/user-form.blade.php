@@ -11,7 +11,7 @@
 
             <!-- Campo Email -->
             <div>
-                <label class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <label class="block text-sm font-medium text-gray-700">Correo electrónico</label>
                 <div class="flex gap-2 relative mt-1">
                     <input type="email" wire:model="email" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
                     
@@ -22,7 +22,7 @@
                             class="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors whitespace-nowrap"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            Generar Email
+                            Generar email
                         </button>
                     @endif
                 </div>
@@ -68,7 +68,7 @@
                         class="flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-xs font-medium transition-colors"
                     >
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                        Generar Aleatoria
+                        Generar password
                     </button>
                 </div>    
 
