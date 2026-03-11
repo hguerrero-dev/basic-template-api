@@ -12,18 +12,9 @@
         </div>
 
         <div>
-            <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-            <input x-bind:type="showPassword ? 'text' : 'password'" id="password" wire:model="password" 
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3 border">
+            
+            <x-password label="Contraseña" hint="It toggles visibility" wire:model="password" clearable />
             @error('password') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-
-            <!-- Mostrar contraseña -->
-            <div class="flex items-center mt-3">
-                <label class="flex items-center cursor-pointer">
-                    <input type="checkbox" x-model="showPassword" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 h-4 w-4">
-                    <span class="ml-2 text-sm text-gray-600">Mostrar contraseña</span>
-                </label>
-            </div>
         </div>
 
         <button type="submit" 
