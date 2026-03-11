@@ -9,9 +9,12 @@ use App\Modules\Roles\Services\RoleService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Mary\Traits\Toast;
 
 class RoleForm extends Component
 {
+    use Toast;
+
     public ?int $roleId = null;
     public array $permissionsCatalogApi = [];
     public array $permissionsCatalogWeb = [];
@@ -151,10 +154,7 @@ class RoleForm extends Component
         $this->dispatch('role-saved');
         $this->dispatch('close-modal', 'role-form-modal');
 
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => 'Rol: ' . $this->name . ' ' . ($this->roleId ? 'editado' : 'creado') . ' exitosamente.'
-        ]);
+        $this->success('Rol: ' . $this->name . ' ' . ($this->roleId ? 'editado' : 'creado') . ' exitosamente.', css: 'alert-success');
 
         $this->reset(['roleId', 'permissionsApi', 'permissionsWeb', 'name', 'description']);
     }

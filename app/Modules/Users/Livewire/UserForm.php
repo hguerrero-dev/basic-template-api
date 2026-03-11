@@ -15,9 +15,12 @@ use Illuminate\Support\Facades\Gate;
 use App\Modules\Users\Enums\UserPermission;
 use App\Modules\Users\Enums\UserStatus;
 use Illuminate\Support\Str;
+use Mary\Traits\Toast;
 
 class UserForm extends Component
 {
+    use Toast;
+
     public ?string $userId = null;
 
     public string $name = '';
@@ -197,10 +200,7 @@ class UserForm extends Component
         $this->dispatch('close-modal', 'user-form-modal');
         $this->dispatch('user-saved');
 
-        $this->dispatch('notify', [
-            'type' => 'success',
-            'message' => 'Usuario: ' . $this->name . ' ' . ($this->userId ? 'editado' : 'creado') . ' exitosamente.'
-        ]);
+        $this->success('Usuario: ' . $this->name . ' ' . ($this->userId ? 'editado' : 'creado') . ' exitosamente.', css: 'alert-success');
     }
 
     public function render()

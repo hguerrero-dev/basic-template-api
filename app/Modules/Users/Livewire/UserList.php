@@ -9,10 +9,11 @@ use App\Modules\Users\Services\UserService;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use App\Modules\Users\Enums\UserPermission;
+use Mary\Traits\Toast;
 
 class UserList extends Component
 {
-    use WithPagination;
+    use WithPagination, Toast;
 
     protected $paginationTheme = 'tailwind';
 
@@ -30,15 +31,15 @@ class UserList extends Component
     {
         Gate::authorize(UserPermission::Delete->value);
 
-        $this->dispatch('open-confirm', [
+        $this->dispatch('open-confirm-modal', [
             'title' => 'Eliminar Usuario',
-            'message' => '¿Estás seguro de que deseas eliminar al usuario: ' . $name . '?',
-            'event' => 'delete-user',
-            'params' => ['id' => $id]
+            'message' => '¿Deseas eliminar este usuario (' . $name . ') de forma permanente?',
+            'event' => 'confirm-delete-user',
+            'params' => $id
         ]);
     }
 
-    #[On('delete-user')]
+    #[On('confirm-delete-user')]
     public function deleteUser($id)
     {
         Gate::authorize(UserPermission::Delete->value);
@@ -47,17 +48,25 @@ class UserList extends Component
             $userService = app(UserService::class);
             $userService->delete($id);
 
-            $this->dispatch('notify', [
-                'type' => 'success',
-                'message' => 'Usuario eliminado exitosamente.'
-            ]);
+            $this->success(
+                title: 'Usuario eliminado exitosamente.',
+                description: 'El usuario: ' . $id . ' ha sido eliminado.',
+                position: 'top-right',
+                css: 'alert-success',
+                timeout: 3000,
+            );
         } catch (\Exception $e) {
             Log::error('Error al eliminar usuario: ' . $e->getMessage());
 
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => 'No se pudo eliminar el usuario. Intente más tarde.'
-            ]);
+            $this->error(
+                title: 'Error',
+                description: 'No se pudo eliminar el usuario. Intente más tarde.',
+                position: 'top-right',
+                css: 'alert-error',
+                timeout: 3000,
+                redirectTo: null,
+                noProgress: false,
+            );
         }
     }
 

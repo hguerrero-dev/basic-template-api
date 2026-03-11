@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,10 +17,16 @@
             if (status === 403) errorMessage = 'No tiene permisos para realizar esta acción.';
             if (status === 500) errorMessage = 'Error interno del servidor.';
 
-            window.dispatchEvent(new CustomEvent('notify', {
+            window.dispatchEvent(new CustomEvent('mary-toast', {
                 detail: {
-                    type: 'error',
-                    message: errorMessage
+                    toast: {
+                        type: 'error',
+                        title: 'Error',
+                        description: errorMessage,
+                        timeout: 3000,
+                        icon: '<svg class="w-7 h-7" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>',
+                        css: 'alert-error'
+                    }
                 }
             }));
             
@@ -56,10 +62,10 @@
     @endguest
 
     <!-- Modal Global -->
-    <x-ui.confirm-modal />
+    <livewire:confirm-modal />
     
     <!-- Componente global Toast -->
-    <x-ui.toast />
+    <x-toast />
     @livewireScripts
 </body>
 </html>

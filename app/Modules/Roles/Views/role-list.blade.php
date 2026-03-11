@@ -67,12 +67,11 @@
                             @endcan
     
                             @can(\App\Modules\Roles\Enums\RolePermission::Delete->value)
-                            <button
-                                wire:click="confirmDelete('{{ $role->id }}', '{{ $role->name }}')"
-                                class="text-red-600 hover:text-red-900 text-sm font-medium transition-colors"
-                            >
-                                Eliminar
-                            </button>
+                            <x-button
+                                label="Eliminar"
+                                class="btn-ghost btn-sm text-error font-medium"
+                                wire:click="confirmDelete({{ $role->id }}, '{{ $role->name }}')"
+                            />
                             @endcan
                         </div>
                     </x-slot:footer>

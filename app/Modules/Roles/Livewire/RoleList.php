@@ -9,10 +9,11 @@ use Livewire\Attributes\On;
 use Exception;
 use Illuminate\Support\Facades\Gate;
 use App\Modules\Roles\Enums\RolePermission;
+use Mary\Traits\Toast;
 
 class RoleList extends Component
 {
-    use WithPagination;
+    use WithPagination, Toast;
 
     public string $guard = 'api';
 
@@ -25,29 +26,27 @@ class RoleList extends Component
         $this->dispatch('create-role');
     }
 
-    // Elimina el método updatedGuard, ya no es necesario
-
     public function updatedSearch()
     {
         $this->resetPage();
     }
 
-    public function confirmDelete($id, $name)
-    {
-        Gate::authorize(RolePermission::Delete->value);
-
-        $this->dispatch('open-confirm', [
-            'title' => 'Eliminar Rol',
-            'message' => '¿Estás seguro de que deseas eliminar el rol: ' . $name . '?',
-            'event' => 'delete-role',
-            'params' => ['id' => $id]
-        ]);
-    }
-
     #[On('role-saved')]
     public function refreshTable() {}
 
-    #[On('delete-role')]
+    public function confirmDelete(int $id, string $name)
+    {
+        Gate::authorize(RolePermission::Delete->value);
+
+        $this->dispatch('open-confirm-modal', [
+            'title' => 'Eliminar Rol',
+            'message' => '¿Deseas eliminar este rol (' . $name . ') de forma permanente?',
+            'event' => 'confirm-delete-role',
+            'params' => $id
+        ]);
+    }
+
+    #[On('confirm-delete-role')]
     public function deleteRole(int $id)
     {
         Gate::authorize(RolePermission::Delete->value);
@@ -57,15 +56,9 @@ class RoleList extends Component
             $role = $roleService->getByOne($id);
             $roleService->delete($role);
 
-            $this->dispatch('notify', [
-                'type' => 'success',
-                'message' => 'Rol eliminado exitosamente.'
-            ]);
+            $this->success('Rol eliminado exitosamente.', css: 'alert-success');
         } catch (Exception $e) {
-            $this->dispatch('notify', [
-                'type' => 'error',
-                'message' => $e->getMessage() ?: 'No se pudo eliminar el rol.'
-            ]);
+            $this->error($e->getMessage() ?: 'No se pudo eliminar el rol.', css: 'alert-error');
         }
     }
 

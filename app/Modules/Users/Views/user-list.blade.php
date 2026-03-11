@@ -102,12 +102,12 @@
                         @endcan
 
                         @can(\App\Modules\Users\Enums\UserPermission::Delete->value)
-                        <button 
+                        <x-button
+                            label="Eliminar"
                             wire:click="confirmDelete('{{ $user->id }}', '{{ $user->name ?? $user->username }}')"
-                            class="text-red-600 hover:text-red-900"
-                        >
-                            Eliminar
-                        </button>
+                            class="btn-ghost btn-sm text-error font-medium"
+                            snpinner
+                        />
                         @endcan
                     </x-ui.td>
                 </tr>

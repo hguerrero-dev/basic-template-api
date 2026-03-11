@@ -12,7 +12,6 @@ use App\Modules\Users\Requests\CreateUserRequest;
 use App\Modules\Users\Requests\UpdateUserRequest;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use App\Modules\Users\Resources\UserResource;
 use Illuminate\Support\Facades\Storage;
 
@@ -97,7 +96,6 @@ class UserController extends BaseController
             'Usuario actualizado correctamente'
         );
     }
-
 
     public function destroy($id): JsonResponse
     {

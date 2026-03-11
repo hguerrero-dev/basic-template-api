@@ -22,37 +22,7 @@
 @endphp
 
 <div 
-    x-data="{
-        open: false,
-        search: '',
-        selected: @entangle($attributes->wire('model')),
-        options: {{ \Illuminate\Support\Js::from($normalizedOptions) }},
-        get filteredOptions() {
-            if (this.search === '') return this.options;
-            return this.options.filter(opt => opt.label.toString().toLowerCase().includes(this.search.toLowerCase()));
-        },
-        toggle(value) {
-            if (!Array.isArray(this.selected)) this.selected = [];
-            if (value === 'super_admin' && !this.selected.includes('super_admin')) {
-                $wire.tryAddRole('super_admin');
-                return;
-            }
-            if (this.selected.includes(value)) {
-                this.selected = this.selected.filter(i => i !== value);
-            } else {
-                this.selected.push(value);
-            }
-            this.$refs.searchInput.focus();
-        },
-        remove(value) {
-            if (!Array.isArray(this.selected)) this.selected = [];
-            this.selected = this.selected.filter(i => i !== value);
-        },
-        getLabel(value) {
-            let opt = this.options.find(o => o.value == value);
-            return opt ? opt.label : value;
-        }
-    }"
+    x-data="selectMultiple(@entangle($attributes->wire('model')), {{ \Illuminate\Support\Js::from($normalizedOptions) }})"
     class="relative mt-1"
     @click.outside="open = false"
 >
