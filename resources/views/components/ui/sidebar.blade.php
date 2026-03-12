@@ -86,7 +86,13 @@
         <x-menu class="border border-base-content/10">
             <x-menu-sub title="Settings" icon="o-cog-6-tooth" icon-classes="text-primary">
                 <x-menu-item title="Profile" icon="o-user" />
-                {{-- <x-menu-item title="Archives" icon="o-archive-box" /> --}}
+
+                <!-- Solo el icono, minimalista -->
+                <div class="flex items-center px-4 py-2">
+                    <x-theme-toggle darkTheme="aqua" lightTheme="retro" />
+                    <span class="ml-2 text-sm text-base-content/80">Tema</span>
+                </div>
+                
                 <x-menu-separator />
                 <div class="px-2 py-1">
                     <livewire:auth.logout />

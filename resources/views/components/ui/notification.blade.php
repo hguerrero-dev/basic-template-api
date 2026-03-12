@@ -1,12 +1,20 @@
-<div class="relative flex items-center mr-2"> 
+<div class="relative flex items-center mr-2">
+
+    @php
+        $array = range(1, 50); // Ejemplo de array para generar items
+    @endphp
     
     <x-dropdown>
-        <x-slot:trigger>
-            <x-button icon="o-bell" class="btn-circle" />
-        </x-slot:trigger>
-
-        <x-menu-item title="Archive" />
-        <x-menu-item title="Move" />
-    </x-dropdown>
+    <x-slot:trigger>
+        <x-heroicon-o-bell class="w-6 h-6 text-gray-500 hover:text-primary cursor-pointer" />
+    </x-slot:trigger>
+    <div class="max-h-80 min-w-65 max-w-xs overflow-y-auto">
+        @foreach ($array as $item)
+            <x-menu-item>
+                <span class="block truncate">Notificación {{ $item }} con texto largo de ejemplo para probar el corte</span>
+            </x-menu-item>
+        @endforeach
+    </div>
+</x-dropdown>
 
 </div>

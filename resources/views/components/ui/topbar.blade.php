@@ -46,9 +46,8 @@
 
     <div class="flex items-center gap-6">
         <div class="flex items-center gap-2">
-            {{-- Notification icon --}}
-            <div class="relative flex items-center mr-2"> 
-                {{-- Componente de Notificaciones de Livewire --}}
+    
+            <div class="relative flex items-center mr-2">
                 <livewire:notification />
             </div>
 
