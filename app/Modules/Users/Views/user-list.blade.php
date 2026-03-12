@@ -130,4 +130,8 @@
 
     <!-- Componente Modal para crear / editar usuario -->
     <livewire:users.user-form />
+
+    <div wire:loading wire:target="confirmDelete">
+        <x-ui.loader-modal />
+    </div>
 </div>

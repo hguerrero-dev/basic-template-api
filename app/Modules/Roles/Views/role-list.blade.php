@@ -96,4 +96,8 @@
     
     <!-- Componente Modal para crear/editar roles -->
     <livewire:roles.role-form />
+
+    <div wire:loading wire:target="confirmDelete">
+        <x-ui.loader-modal />
+    </div>
 </div>

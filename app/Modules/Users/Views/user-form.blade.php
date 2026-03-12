@@ -32,25 +32,30 @@
              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <!-- Select de Rol -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Roles del Sistema</label>
-                    <x-ui.select-multiple
-                        wire:model="roles" 
+                    <x-choices
+                        label="Selecciona roles"
+                        wire:model="roles"
                         :options="$this->catalogs['roles']"
-                        @change="handleRoleChange($event)"
-                        placeholder="Busca y selecciona roles..." 
+                        placeholder="Busca y selecciona roles..."
+                        multiple
+                        searchable
+                        no-result-text="¡Ops! Nada aquí ..."
+                        no-progress
+                        data-choices
                     />
-                    @error('roles') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
                 </div>
 
                 <!-- Select de Estado -->
                 <div>
-                    <label class="block text-sm font-medium text-gray-700">Estado de Cuenta</label>
-                    <select wire:model="status" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2 bg-white">
-                        @foreach($this->catalogs['estados'] as $catEstado)
-                            <option value="{{ $catEstado['value'] }}">{{ $catEstado['label'] }}</option>
-                        @endforeach
-                    </select>
-                    @error('status') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    <x-choices-offline
+                        label="Estado de la cuenta"
+                        wire:model="status"
+                        :options="$this->catalogs['estados']"
+                        placeholder="Search ..."
+                        single
+                        clearable
+                        searchable 
+                    />
                 </div>
             </div>
 
@@ -147,3 +152,16 @@
         </div>
     </form>
 </x-ui.modal>
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('select[data-choices]').forEach(function(select) {
+            if (!select.dataset.choicesInitialized) {
+                new window.Choices(select, { removeItemButton: true, searchEnabled: true });
+                select.dataset.choicesInitialized = true;
+            }
+        });
+    });
+</script>
+@endpush

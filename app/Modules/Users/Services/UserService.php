@@ -78,13 +78,13 @@ class UserService extends BaseService
     public function getFormOptions(): array
     {
         $statuses = array_map(fn($status) => [
-            'label' => ucfirst($status->value),
-            'value' => $status->value,
+            'name' => ucfirst($status->value),
+            'id' => $status->value,
         ], UserStatus::cases());
 
         $roles = Role::all()->map(fn($role) => [
-            'label' => ucfirst($role->name) . ' (' . $role->guard_name . ')',
-            'value' => $role->name,
+            'name' => ucfirst($role->name) . ' (' . $role->guard_name . ')',
+            'id' => $role->name,
         ])->toArray();
 
         return [

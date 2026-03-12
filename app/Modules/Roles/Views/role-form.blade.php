@@ -61,21 +61,25 @@
                     <label class="block text-sm font-medium text-gray-700">Permisos del Rol</label>
                     <div x-data="{ guard: @entangle('guard') }">
                         <div x-show="guard === 'api'">
-                            <x-ui.select-multiple
+                            <x-choices
                                 wire:model="permissionsApi"
                                 :options="$permissionsCatalogApi"
-                                option-label="name"
-                                option-value="id"
                                 placeholder="Busca y selecciona permisos API..."
+                                multiple
+                                searchable
+                                no-result-text="¡Ops! Nada aquí ..."
+                                no-progress
                             />
                         </div>
                         <div x-show="guard === 'web'">
-                            <x-ui.select-multiple
+                            <x-choices
                                 wire:model="permissionsWeb"
                                 :options="$permissionsCatalogWeb"
-                                option-label="name"
-                                option-value="id"
                                 placeholder="Busca y selecciona permisos WEB..."
+                                multiple
+                                searchable
+                                no-result-text="¡Ops! Nada aquí ..."
+                                no-progress
                             />
                         </div>
                     </div>

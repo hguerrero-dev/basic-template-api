@@ -1,29 +1,40 @@
 <div class="min-h-screen flex items-center justify-center">
     <div class="max-w-md w-full bg-white p-8 border border-gray-200 rounded-lg shadow-sm">
-        <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">Iniciar Sesión</h2>
+        <x-card title="Iniciar Sesión" shadow separator>
+            <!-- Formulario para usar lógica de PHP -->
+            <x-form wire:submit="authenticate" no-separator>
+                <div>
+                    <x-input 
+                        label="Correo Electrónico o Usuario" 
+                        wire:model="identifier" 
+                        popover="Puedes Ingresar con tu correo electrónico o tu nombre de usuario" 
+                    />
+                </div>
 
-    <!-- Formulario para usar lógica de PHP -->
-    <form wire:submit="authenticate" class="space-y-4" x-data="{ showPassword: false }">
-        <div>
-            <label for="identifier" class="block text-sm font-medium text-gray-700">Correo Electrónico o Usuario</label>
-            <input type="text" id="identifier" wire:model="identifier" 
-                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm p-3 border" >
-            @error('identifier') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-        </div>
+                <div>
+                    
+                    <x-password 
+                        label="Contraseña" 
+                        hint="Tu contraseña debe tener al menos 8 caracteres" 
+                        wire:model="password" 
+                        clearable 
+                    />
+                </div>
 
-        <div>
-            
-            <x-password label="Contraseña" hint="It toggles visibility" wire:model="password" clearable />
-            @error('password') <span class="text-red-500 text-xs mt-1 block">{{ $message }}</span> @enderror
-        </div>
+                <x-button
+                    class="btn-primary w-full"
+                    label="Ingresar" 
+                    type="submit" 
+                    spiner="save"
+                />
 
-        <button type="submit" 
-            class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150">
-            Ingresar
-        </button>
-    </form>
+                <div wire:loading wire:target="authenticate">
+                    <x-ui.loader-modal />
+                </div>
+            </x-form>
+        </x-card>
 
-        <div class="mt-6 text-center">
+        <x-card>
             <p class="text-sm text-gray-600">
                 ¿No tienes cuenta?
                 <!-- Enlace modo Livewire SPA -->
@@ -31,6 +42,7 @@
                     Regístrate aquí
                 </a>
             </p>
-        </div>
+        </x-card>
+
     </div>
 </div>  

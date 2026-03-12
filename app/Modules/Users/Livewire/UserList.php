@@ -46,11 +46,12 @@ class UserList extends Component
 
         try {
             $userService = app(UserService::class);
+            $user = $userService->getByOne($id); // Verificar que el usuario existe antes de intentar eliminarlo
             $userService->delete($id);
 
             $this->success(
                 title: 'Usuario eliminado exitosamente.',
-                description: 'El usuario: ' . $id . ' ha sido eliminado.',
+                description: 'El usuario: ' . $user->name . ' ha sido eliminado.',
                 position: 'top-right',
                 css: 'alert-success',
                 timeout: 3000,

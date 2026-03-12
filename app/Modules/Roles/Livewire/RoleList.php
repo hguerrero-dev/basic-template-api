@@ -50,15 +50,26 @@ class RoleList extends Component
     public function deleteRole(int $id)
     {
         Gate::authorize(RolePermission::Delete->value);
-
         try {
             $roleService = app(RoleService::class);
             $role = $roleService->getByOne($id);
             $roleService->delete($role);
 
-            $this->success('Rol eliminado exitosamente.', css: 'alert-success');
+            $this->success(
+                title: 'Rol eliminado exitosamente.',
+                description: 'El rol: ' . $role->name . ' ha sido eliminado.',
+                position: 'top-right',
+                css: 'alert-success',
+                timeout: 3000
+            );
         } catch (Exception $e) {
-            $this->error($e->getMessage() ?: 'No se pudo eliminar el rol.', css: 'alert-error');
+            $this->error(
+                title: 'Error',
+                description: $e->getMessage() ?: 'No se pudo eliminar el rol.',
+                position: 'top-right',
+                css: 'alert-error',
+                timeout: 3000
+            );
         }
     }
 
