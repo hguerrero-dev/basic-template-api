@@ -4,7 +4,7 @@ services:
   app:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.debian
     container_name: minsit-app
     restart: always
     environment:
@@ -13,22 +13,22 @@ services:
       APP_DEBUG: "true"
       DB_CONNECTION: pgsql
       DB_HOST: postgres
-      DB_PORT: 5432
+      DB_PORT: 5433
       DB_DATABASE: minsit_db
       DB_USERNAME: hguerrero
       DB_PASSWORD: password123
       REDIS_HOST: redis
-      REDIS_PORT: 6379
+      REDIS_PORT: 6380
       REDIS_DB: 0
       REDIS_CACHE_DB: 0
       FILESYSTEM_DISK: minio
       MINIO_ENDPOINT: minio
-      MINIO_PORT: 9000
+      MINIO_PORT: 9002
       MINIO_ACCESS_KEY: minio
       MINIO_SECRET_KEY: minio123
       MINIO_BUCKET: minsit-bucket
     ports:
-      - "9000:9000"
+      - "9010:9000"
     volumes:
       - .:/var/www
     depends_on:
@@ -45,7 +45,7 @@ services:
       POSTGRES_USER: hguerrero
       POSTGRES_PASSWORD: password123
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
@@ -54,7 +54,7 @@ services:
     container_name: minsit-redis
     restart: always
     ports:
-      - "6379:6379"
+      - "6380:6379"
 
   minio:
     image: minio/minio:latest
@@ -64,7 +64,7 @@ services:
       MINIO_ROOT_USER: minio
       MINIO_ROOT_PASSWORD: minio123
     ports:
-      - "9001:9000"
+      - "9002:9000"
     volumes:
       - minio_data:/data
     command: server /data
