@@ -3,6 +3,7 @@
 namespace App\Modules\Users\Livewire;
 
 use App\Modules\Roles\Enums\SystemRole;
+use App\Modules\Roles\Models\Role;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Computed;
@@ -32,6 +33,13 @@ class UserForm extends Component
     public array $previousRoles = [];
     public $pendingSuperAdmin = false;
     public string $status = 'active';
+
+    public function search($value)
+    {
+        return Role::where('name', 'like', "%{$value}%")
+            ->pluck('name')
+            ->toArray();
+    }
 
     #[Computed]
     public function catalogs()

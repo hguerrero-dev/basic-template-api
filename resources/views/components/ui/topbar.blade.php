@@ -44,7 +44,7 @@
         @php
             $section = $breadcrumbs[count($breadcrumbs)-1]['label'] ?? '';
         @endphp
-        <span class="text-base-content/60 text-sm font-semibold">{{ $section }}</span>
+        <span class="text-base-content/90 text-sm font-semibold">{{ $section }}</span>
     </div>
 
     {{-- Centro: Menú principal --}}
@@ -57,19 +57,34 @@
     </nav>
 
     <div class="flex items-center gap-6">
-        <div class="bg-white p-3 rounded-box shadow-sm border border-base-200 flex items-center gap-2">
+        <div class=" flex items-center gap-2">
     
             <div class="relative flex items-center mr-2">
                 <livewire:notification />
             </div>
 
-            @if(auth()->user()->avatar)
-                <x-avatar :image="auth()->user()->avatar" :title="auth()->user()->username" />
-            @else
-                <x-avatar :title="auth()->user()->username">
-                    {{ strtoupper(substr(trim(auth()->user()->name ?? auth()->user()->username ?? 'A'), 0, 1)) }}
-                </x-avatar>
-            @endif
+            {{-- Avatar estilo moderno --}}
+            <div class="flex items-center gap-3">
+                @if(auth()->user()->avatar)
+                    <div class="flex items-center gap-3">
+                        <img src="{{ auth()->user()->avatar }}" alt="Avatar" class="w-10 h-10 rounded-full object-cover border border-base-300 shadow-sm" />
+                        <div class="flex flex-col">
+                            <span class="text-base-content font-semibold text-sm leading-tight">{{ auth()->user()->username }}</span>
+                            <span class="text-base-content/60 text-xs leading-tight">{{ auth()->user()->name }}</span>
+                        </div>
+                    </div>
+                @else
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-base-300 flex items-center justify-center text-xl font-bold text-base-content shadow-sm">
+                            {{ strtoupper(substr(trim(auth()->user()->name ?? auth()->user()->username ?? 'A'), 0, 1)) }}
+                        </div>
+                        <div class="flex flex-col">
+                            <span class="text-base-content font-semibold text-sm leading-tight">{{ auth()->user()->username }}</span>
+                            <span class="text-base-content/60 text-xs leading-tight">{{ auth()->user()->name }}</span>
+                        </div>
+                    </div>
+                @endif
+            </div>
         </div>
     </div>
 </header>

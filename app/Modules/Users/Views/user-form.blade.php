@@ -4,29 +4,36 @@
             
             <!-- Campo Nombre -->
             <div>
-                <label class="block text-sm font-medium text-gray-700">Nombre completo</label>
-                <input type="text" wire:model="name" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
-                @error('name') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                <x-input 
+                    wire:model="name" 
+                    placeholder="Nombre completo" 
+                    icon="o-user"
+                    hint="Escribe el nombre completo del usuario"
+                />
             </div>
 
             <!-- Campo Email -->
             <div>
-                <label class="block text-sm font-medium text-gray-700">Correo electrónico</label>
                 <div class="flex gap-2 relative mt-1">
-                    <input type="email" wire:model="email" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
-                    
-                    @if(!$userId)
-                        <button 
-                            type="button"
-                            wire:click="generateEmail" 
-                            class="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors whitespace-nowrap"
-                        >
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                            Generar email
-                        </button>
-                    @endif
+                    <div class="flex w-full items-center gap-2">
+                        <x-input
+                            wire:model="email" 
+                            placeholder="Correo electrónico" 
+                            icon="o-envelope" 
+                            class="flex-1"
+                        />
+                        @if(!$userId || ($userId && !$email))
+                            <button 
+                                type="button"
+                                wire:click="generateEmail" 
+                                class="flex items-center gap-1 px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md text-sm font-medium transition-colors shadow-sm whitespace-nowrap"
+                            >
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Generar email
+                            </button>
+                        @endif
+                    </div>
                 </div>
-                @error('email') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
             </div>
 
              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -60,7 +67,7 @@
             </div>
 
             <!-- Contenedor general de Password -->
-            <div x-data="{ showPassword: false }" class="space-y-4 pt-2 border-t border-gray-100">
+            <div class="space-y-4 pt-2 border-t border-gray-100">
                 
                 <!-- Encabezado y Botón Generar -->
                 <div class="flex justify-between items-center {{ $userId ? 'opacity-50 pointer-events-none' : '' }}">
@@ -78,35 +85,23 @@
                 </div>    
 
                 <!-- Inputs de Password -->
-                <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 relative">
-                    <!-- Campo Contraseña -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">
-                            Contraseña 
-                            @if($userId) <span class="text-gray-400 font-normal">(Vacío para omitir)</span> @endif
-                        </label>
-                        <input x-bind:type="showPassword ? 'text' : 'password'" wire:model.live="password" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
-                        @error('password') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                <div x-data="{ show: false }">
+                    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                        <!-- Campo Contraseña -->
+                        <div>
+                            <input :type="show ? 'text' : 'password'" class="input w-full" placeholder="Contraseña" wire:model="password" />
+                        </div>
+                        <!-- Campo Confirmación -->
+                        <div>
+                            <input :type="show ? 'text' : 'password'" class="input w-full" placeholder="Confirmar Contraseña" wire:model="password_confirmation" />
+                        </div>
                     </div>
-                    
-                    <!-- Campo Confirmación -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">
-                            Confirmar Contraseña 
-                        </label>
-                        <input x-bind:type="showPassword ? 'text' : 'password'" wire:model.live="password_confirmation" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm border px-3 py-2">
-                        @error('password_confirmation') <span class="text-red-500 text-xs">{{ $message }}</span> @enderror
+                    <div class="mt-2 flex items-center gap-2">
+                        <input type="checkbox" id="show-password" x-model="show" class="form-checkbox" />
+                        <label for="show-password" class="text-sm text-gray-600 cursor-pointer">Mostrar contraseña</label>
                     </div>
-                    
                 </div>
                 
-                <!-- Mostrar contraseña generada -->
-                <div class="flex items-center justify-end mt-2">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" x-model="showPassword" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 h-4 w-4">
-                        <span class="ml-2 text-sm text-gray-600">Mostrar contraseña</span>
-                    </label>
-                </div>
             </div>
 
             <!-- Modal de confirmación para Super_admin -->
@@ -142,26 +137,19 @@
         </div>
 
         <div class="flex justify-end gap-3 mt-6">
-            <button type="button" x-on:click="show = false" class="px-4 py-2 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-md transition-colors text-sm font-medium shadow-sm">
-                Cancelar
-            </button>
-            <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-md transition-colors text-sm font-medium shadow-sm flex items-center gap-2">
-                <span wire:loading.remove wire:target="save">Guardar</span>
-                <span wire:loading wire:target="save">Cargando...</span>
-            </button>
+          <x-button 
+                label="Cancelar" 
+                x-on:click="show = false" 
+                type="button" 
+                class="btn btn-secondary" 
+                class="px-4 py-2 bg-gray-200 text-gray-700 hover:bg-gray-300 rounded-md transition-colors text-sm font-medium shadow-sm"
+            />
+            <x-button 
+                label="Guardar" 
+                type="submit" 
+                class="btn btn-primary" 
+                spinner="save" 
+            />
         </div>
     </form>
 </x-ui.modal>
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('select[data-choices]').forEach(function(select) {
-            if (!select.dataset.choicesInitialized) {
-                new window.Choices(select, { removeItemButton: true, searchEnabled: true });
-                select.dataset.choicesInitialized = true;
-            }
-        });
-    });
-</script>
-@endpush

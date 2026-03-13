@@ -24,6 +24,17 @@ class RoleForm extends Component
     public string $name = '';
     public string $description = '';
 
+
+    public function search($value)
+    {
+        $catalog = $this->guard === 'api' ? $this->permissionsCatalogApi : $this->permissionsCatalogWeb;
+
+        return collect($catalog)
+            ->filter(fn($perm) => str_contains(strtolower($perm['name']), strtolower($value)))
+            ->values()
+            ->toArray();
+    }
+
     public function mount(RoleService $roleService)
     {
         $this->loadPermissionsCatalogs($roleService);
