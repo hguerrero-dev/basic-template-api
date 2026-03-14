@@ -104,17 +104,19 @@ class UserController extends BaseController
         return $this->successResponse(null, 'Usuario eliminado correctamente');
     }
 
-    public function uploadAvatar(Request $request) // Quitamos el User $user de aquí
+    public function uploadAvatar(Request $request, $id)
     {
         $request->validate([
             'avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        // Obtenemos el usuario REAL que está haciendo la petición
-        $user = $request->user();
+        $authUser = $request->user();
 
-        // Llamamos al servicio (asegúrate de que el servicio reciba este $user)
-        $result = $this->userService->updateAvatar($user, $request->file('avatar'));
+        if (!$authUser || $authUser->id !== $id) {
+            return $this->errorResponse('Unauthorized', 401);
+        }
+
+        $result = $this->userService->updateAvatar($authUser, $request->file('avatar'));
 
         return $this->successResponse($result, 'Avatar actualizado correctamente');
     }

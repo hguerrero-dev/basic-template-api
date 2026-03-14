@@ -151,6 +151,7 @@ class UserService extends BaseService
 
     public function updateAvatar($user, $file)
     {
+
         /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
         $disk = Storage::disk('minio');
 
