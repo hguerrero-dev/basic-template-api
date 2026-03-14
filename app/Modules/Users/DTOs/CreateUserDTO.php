@@ -8,8 +8,8 @@ class CreateUserDTO
 {
     public function __construct(
         public string $name,
-        public string $password,
         public string $email,
+        public string $password,
         public array $roles = [],
         public string $status = UserStatus::Active->value
     ) {}

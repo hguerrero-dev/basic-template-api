@@ -98,6 +98,9 @@ class UserService extends BaseService
     public function create(CreateUserDTO $dto)
     {
         $username = $this->generateUniqueUsername($dto->name, $dto->email);
+
+        $this->validateExistingEmailAndUsername($dto->email, $username);
+
         $user = User::create([
             'name' => $dto->name,
             'username' => $username,
@@ -175,6 +178,17 @@ class UserService extends BaseService
             'avatar_url' => $url,
             'path' => $path
         ];
+    }
+
+    protected function validateExistingEmailAndUsername($email, $username)
+    {
+        if (User::where('email', $email)->exists()) {
+            throw new \Exception('El email ya está registrado.');
+        }
+
+        if (User::where('username', $username)->exists()) {
+            throw new \Exception('El username ya está registrado.');
+        }
     }
 
     protected function manageRoles(User $user, array $roles)

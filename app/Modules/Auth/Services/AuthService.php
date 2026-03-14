@@ -14,6 +14,18 @@ class AuthService
     {
         $user = $this->validateUserCredentials($identifier, $password);
 
+        $rolesValidate = $user->roles;
+
+        $hasApiRole = $rolesValidate->contains(function ($role) {
+            return $role->guard_name === 'api';
+        });
+
+        if (!$hasApiRole) {
+            throw ValidationException::withMessages([
+                'identifier' => ['No tienes permisos para acceder a la API.'],
+            ]);
+        }
+
         $roles = $user->getRoleNames()->filter(function ($role) {
             return str_starts_with($role, 'api_');
         });
@@ -35,6 +47,18 @@ class AuthService
     public function authenticateWeb(string $identifier, string $password)
     {
         $user = $this->validateUserCredentials($identifier, $password);
+
+        $roles = $user->roles;
+
+        $hasWebRole = $roles->contains(function ($role) {
+            return $role->guard_name === 'web';
+        });
+
+        if (!$hasWebRole) {
+            throw ValidationException::withMessages([
+                'identifier' => ['No tienes permisos para acceder al panel de administración.'],
+            ]);
+        }
 
         Auth::guard('web')->login($user);
         session()->regenerate();

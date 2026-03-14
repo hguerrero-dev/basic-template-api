@@ -62,19 +62,23 @@ class UserController extends BaseController
 
     public function store(CreateUserRequest $request): JsonResponse
     {
-        $dto = new CreateUserDTO(
-            $request->input('name'),
-            $request->input('email'),
-            $request->input('password'),
-            $request->input('roles', [])
-        );
-        $user = $this->userService->create($dto);
+        try {
+            $dto = new CreateUserDTO(
+                $request->input('name'),
+                $request->input('email'),
+                $request->input('password'),
+                $request->input('roles', [])
+            );
+            $user = $this->userService->create($dto);
 
-        return $this->successResponse(
-            new UserResource($user),
-            'Usuario creado correctamente',
-            201
-        );
+            return $this->successResponse(
+                new UserResource($user),
+                'Usuario creado correctamente',
+                201
+            );
+        } catch (\Exception $e) {
+            return $this->errorResponse($e->getMessage(), 400);
+        }
     }
 
 
