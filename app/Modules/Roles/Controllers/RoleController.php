@@ -48,8 +48,11 @@ class RoleController extends BaseController
     {
         $dto = new CreateRoleDTO(
             $request->input('name'),
+            $request->input('description', ''),
+            $request->input('guard_name', 'web'),
             $request->input('permissions', [])
         );
+
         $role = $this->roleService->create($dto);
 
         return $this->successResponse($role, 'Rol creado correctamente', 201);

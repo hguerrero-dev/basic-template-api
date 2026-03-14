@@ -42,12 +42,12 @@ return [
             'driver' => 's3',
             'key' => env('MINIO_ACCESS_KEY_ID'),
             'secret' => env('MINIO_SECRET_ACCESS_KEY'),
-            'region' => env('MINIO_DEFAULT_REGION', 'us-east-1'),
+            'region' => env('MINIO_DEFAULT_REGION'),
             'bucket' => env('MINIO_BUCKET'),
             'endpoint' => env('MINIO_ENDPOINT'),
-            'url' => env('MINIO_URL'),
             'use_path_style_endpoint' => env('MINIO_USE_PATH_STYLE_ENDPOINT', true),
-            'throw' => false,
+            'url' => env('MINIO_URL'),
+            'visibility' => 'public',
         ],
 
         'public' => [

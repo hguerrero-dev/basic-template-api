@@ -8,9 +8,11 @@ use App\Modules\Users\DTOs\CreateUserDTO;
 use App\Modules\Users\DTOs\UpdateUserDTO;
 use App\Modules\Users\Enums\UserStatus;
 use App\Modules\Users\Models\User;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Role;
 
@@ -145,6 +147,33 @@ class UserService extends BaseService
 
         $user->delete();
         Cache::tags([User::CACHE_TAG])->flush();
+    }
+
+    public function updateAvatar($user, $file)
+    {
+        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
+        $disk = Storage::disk('minio');
+
+        $fileName = "user_{$user->id}." . $file->getClientOriginalExtension();
+        $path = "avatars/{$fileName}";
+
+        // Intentamos subir y verificamos si se guardó
+        $uploaded = $disk->putFileAs('avatars', $file, $fileName, 'public');
+
+        if (!$uploaded) {
+            throw new \Exception("No se pudo subir el archivo a MinIO. Revisa la conexión al endpoint.");
+        }
+
+        $url = $disk->url($path);
+
+        // Actualizamos el usuario en la BD
+        $user->avatar = $url;
+        $user->save();
+
+        return [
+            'avatar_url' => $url,
+            'path' => $path
+        ];
     }
 
     protected function manageRoles(User $user, array $roles)

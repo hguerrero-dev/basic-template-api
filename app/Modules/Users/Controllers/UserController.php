@@ -104,31 +104,18 @@ class UserController extends BaseController
         return $this->successResponse(null, 'Usuario eliminado correctamente');
     }
 
-    public function uploadAvatar(Request $request, User $user)
+    public function uploadAvatar(Request $request) // Quitamos el User $user de aquí
     {
         $request->validate([
             'avatar' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
-        // Si el usuario ya tiene un avatar, lo eliminamos de MinIO
-        if ($user->avatar) {
-            Storage::disk('minio')->delete($user->avatar);
-        }
+        // Obtenemos el usuario REAL que está haciendo la petición
+        $user = $request->user();
 
-        // Subimos el nuevo archivo al disco 'minio' en la carpeta 'avatars'
-        $path = $request->file('avatar')->store('avatars', 'minio');
+        // Llamamos al servicio (asegúrate de que el servicio reciba este $user)
+        $result = $this->userService->updateAvatar($user, $request->file('avatar'));
 
-        // Actualizamos el usuario
-        $user->update(['avatar' => $path]);
-
-        // Evitar el error P1013 del editor
-        /** @var \Illuminate\Filesystem\FilesystemAdapter $disk */
-        $disk = Storage::disk('minio');
-        $url = $disk->url($path);
-
-        return $this->successResponse([
-            'avatar_url' => $url,
-            'path' => $path
-        ], 'Avatar actualizado correctamente');
+        return $this->successResponse($result, 'Avatar actualizado correctamente');
     }
 }
